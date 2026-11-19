@@ -4,7 +4,8 @@ import numpy as np, soundfile as sf
 SR = 44100
 
 
-def build_mix(total, voice_clips, intense_spans, booms, cuts, arrows, out_wav, seed=0):
+def build_mix(total, voice_clips, intense_spans, booms, cuts, arrows, out_wav, seed=0, genre='myth'):
+    horror = genre == 'ghost'
     rng = np.random.default_rng(seed)
     N = int(total * SR) + SR
     t = np.arange(N) / SR
@@ -20,9 +21,9 @@ def build_mix(total, voice_clips, intense_spans, booms, cuts, arrows, out_wav, s
         s = sum((1 / n) * np.sin(2 * np.pi * f * n * tt + n) * (1 + 0.3 * np.sin(2 * np.pi * 0.7 * tt * n)) for n in range(1, 14))
         return s * np.exp(-tt * 1.6) * (1 - np.exp(-tt * 200))
 
-    Sa = rng.choice([130.8, 138.6, 146.8, 123.5]); Pa = Sa * 0.75
-    cyc = rng.uniform(2.2, 2.8)
-    notes = [Pa * 2, Sa * 2, Sa * 2, Sa]
+    Sa = rng.choice([130.8, 138.6, 146.8, 123.5]) if not horror else rng.choice([98.0, 103.8, 110.0]); Pa = Sa * 0.75
+    cyc = rng.uniform(2.2, 2.8) if not horror else rng.uniform(4.5, 6.0)
+    notes = [Pa * 2, Sa * 2, Sa * 2, Sa] if not horror else [Sa * 2, Sa * 2 ** (6 / 12) * 2, Sa * 2 ** (1 / 12) * 2, Sa]
     plucks = {n: pluck(n) for n in set(notes)}
     at, k = 0.0, 0
     while at < total:
@@ -32,7 +33,11 @@ def build_mix(total, voice_clips, intense_spans, booms, cuts, arrows, out_wav, s
     for a, b in intense_spans:
         intense[int(a * SR):int(b * SR)] = 1
     intense = np.convolve(intense, np.ones(SR) / SR, 'same')
-    pad = (np.sin(2 * np.pi * Sa / 2 * t) + 0.6 * np.sin(2 * np.pi * Pa * t) + 0.4 * np.sin(2 * np.pi * Sa * 1.2 * t + 1)) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.1 * t))
+    if horror:   # detuned tritone drone + slow swell
+        pad = (np.sin(2 * np.pi * Sa / 2 * t) + 0.7 * np.sin(2 * np.pi * Sa / 2 * 1.007 * t) + 0.5 * np.sin(2 * np.pi * Sa * 2 ** (6 / 12) * t)
+               + 0.25 * np.sin(2 * np.pi * Sa * 4.02 * t)) * (0.5 + 0.5 * np.sin(2 * np.pi * 0.06 * t) ** 2)
+    else:
+        pad = (np.sin(2 * np.pi * Sa / 2 * t) + 0.6 * np.sin(2 * np.pi * Pa * t) + 0.4 * np.sin(2 * np.pi * Sa * 1.2 * t + 1)) * (0.6 + 0.4 * np.sin(2 * np.pi * 0.1 * t))
     fade = np.interp(t, [0, 3, total - 2, total], [0, 1, 1, 0])
     music += pad * (0.09 + 0.07 * intense) * fade
 
@@ -46,6 +51,11 @@ def build_mix(total, voice_clips, intense_spans, booms, cuts, arrows, out_wav, s
     big, small = dhol(150, 0.3), dhol(220, 0.15)
     for a, b in intense_spans:
         at, k = a, 0
+        if horror:   # heartbeat instead of dhol
+            hb = dhol(70, 0.18)
+            while at < b:
+                add(music, hb, at, 0.45); add(music, hb, at + 0.28, 0.3); at += 60 / 66
+            continue
         while at < b:
             v = pat[k % 8]
             if v:

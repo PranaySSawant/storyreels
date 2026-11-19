@@ -162,7 +162,8 @@ class Episode:
             sh = l['shot']; s0, s1 = self.spans[i]
             if (sh['type'] == 'wide' and (sh.get('enemies') or sh.get('arrows'))) or sh.get('mood') == 'angry' or sh.get('kind') in ('fire', 'storm'):
                 intense.append((s0, s1))
-            if sh.get('mood') == 'angry' or sh['type'] == 'end' or sh.get('kind') == 'storm':
+            if sh.get('mood') in ('angry', 'scared', 'shock') or sh['type'] == 'end' or sh.get('kind') == 'storm' or \
+                    (sh.get('char') in self.params and self.params[sh['char']].get('ghost') and (i == 0 or self.lines[i - 1]['shot'].get('char') != sh.get('char'))):
                 booms.append(s0)
         booms += self.flashes
         merged = []
@@ -172,13 +173,34 @@ class Episode:
             else:
                 merged.append((a, b))
         audio.build_mix(self.total, [(f'{self.wd}/l{i:02d}.wav', s) for i, s in enumerate(self.starts)], merged, booms,
-                        [s[0] for s in self.spans[1:]], [a[0] for a in self.arrows], out_wav, seed=self.ep.get('part', 1))
+                        [s[0] for s in self.spans[1:]], [a[0] for a in self.arrows], out_wav, seed=self.ep.get('part', 1), genre=self.ep.get('genre', 'myth'))
 
     # ---------------------------------------------------------------- visuals
     def assets(self):
         self.bg = {}
         self.vig = art.vignette()
         self._bust, self._fig, self._cap = {}, {}, {}
+        self._ghost = {}
+        self._fog = None
+
+    def ghostify(self, img, t):
+        lvl = [0.55, 0.7, 0.85][int(t * 7) % 3 if random.Random(int(t * 7)).random() < 0.35 else 1]
+        k = (id(img), lvl)
+        if k not in self._ghost:
+            g = img.copy(); g.putalpha(g.getchannel('A').point(lambda v: int(v * lvl)))
+            self._ghost[k] = g
+        return self._ghost[k]
+
+    def fog(self, im, t):
+        if self._fog is None:
+            lay = Image.new('RGBA', (int(OW * 1.6), OH), (0, 0, 0, 0)); d = art.SD(lay)
+            r = random.Random(77)
+            for _ in range(22):
+                x = r.randint(-200, 1100); y = r.randint(700, 1250)
+                d.ellipse([x, y, x + r.randint(260, 480), y + r.randint(60, 120)], fill=(170, 210, 200, 70))
+            self._fog = lay.filter(ImageFilter.GaussianBlur(28 * K))
+        off = int(((t * 18) % (W * 0.6)) * K)
+        im.alpha_composite(self._fog.crop((off, 0, off + OW, OH)))
 
     def BG(self, k):
         if k not in self.bg:
@@ -360,7 +382,11 @@ class Episode:
             im = self.BG(sh.get('bg', 'battlefield')).copy()
             if sh.get('char') in self.chars:
                 b = self.bust(sh['char'], 0, False, None)
+                if self.params[sh['char']].get('ghost'):
+                    b = self.ghostify(b, t)
                 im.alpha_composite(b, (0, int((300 + bob) * K)))
+            if sh.get('bg') in ('haunted', 'fort_ruins', 'village_night'):
+                self.fog(im, t)
             im.alpha_composite(Image.new('RGBA', (OW, OH), (0, 0, 0, 90)))
             self.embers(im, t, 1)
         elif typ == 'bust':
@@ -369,7 +395,13 @@ class Episode:
             if self.params[cid].get('glow') and mood != 'sleep':
                 art.glow(im, 360, 560, 260, self.params[cid]['glow'], 45)
             blink = (t * 1000 + sum(map(ord, cid)) * 37) % 3400 < 130
-            im.alpha_composite(self.bust(cid, self.mouth(cid, t), blink, mood), (0, int((bob + 30) * K)))
+            bimg = self.bust(cid, self.mouth(cid, t), blink, mood)
+            if self.params[cid].get('ghost'):
+                bimg = self.ghostify(bimg, t)
+                bob += 8 * math.sin(t * 1.3)
+            im.alpha_composite(bimg, (0, int((bob + 30) * K)))
+            if sh['bg'] in ('haunted', 'fort_ruins', 'village_night'):
+                self.fog(im, t)
             if mood == 'angry':
                 self.embers(im, t, 4, 30)
                 if ts < 0.35:
@@ -409,6 +441,8 @@ class Episode:
                         shake = (rnd.randint(-10, 10), rnd.randint(-10, 10))
                 if sh['bg'].startswith('battle'):
                     self.embers(im, t, 3, 30)
+                if sh['bg'] in ('haunted', 'fort_ruins', 'village_night'):
+                    self.fog(im, t)
         elif typ == 'symbol':
             cap_y = 1090 if sh['kind'] != 'fire' else 190
             im = self.symbol(sh['kind'], ts, sh['bg'])

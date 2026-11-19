@@ -103,6 +103,25 @@ PRESETS = {
     'goddess':     dict(gender='f', skin=(232, 180, 130), hair=(22, 18, 18), crown='gold', tilak='bindi', cloth=(210, 40, 40), glow=(255, 220, 120)),
     'boy':         dict(gender='m', skin=(210, 150, 100), hair=(22, 18, 18), crown='none', tilak='red_v', cloth=(240, 200, 80), young=True),
     'commoner':    dict(gender='m', skin=(170, 112, 76), hair=(22, 18, 18), mustache=True, crown='turban', cloth=(230, 225, 210)),
+    # --- history ---
+    'maratha_king':    dict(gender='m', skin=(184, 124, 84), hair=(20, 16, 16), beard=(24, 18, 16), pointed_beard=True, mustache=True, crown='pagdi', turban=(232, 120, 30), tilak='red_v', armor=True, sash=(232, 120, 30)),
+    'maratha_warrior': dict(gender='m', skin=(170, 110, 74), hair=(20, 16, 16), mustache=True, crown='pagdi', turban=(190, 40, 40), tilak='red_v', armor=True, sash=(232, 120, 30)),
+    'rajput_king':     dict(gender='m', skin=(196, 136, 92), hair=(20, 16, 16), beard=(26, 20, 18), mustache=True, crown='safa', turban=(214, 50, 90), tilak='red_v', armor=True, sash=(240, 190, 50)),
+    'emperor':         dict(gender='m', skin=(200, 146, 104), hair=(24, 18, 16), beard=(30, 22, 18), mustache=True, crown='safa', turban=(240, 236, 220), armor=True, sash=(40, 110, 70)),
+    'ancient_king':    dict(gender='m', skin=(190, 130, 88), hair=(20, 16, 16), mustache=True, crown='gold', armor=True, sash=(120, 40, 140)),
+    'chanakya':        dict(gender='m', skin=(176, 120, 82), hair=(30, 26, 24), crown='shikha', tilak='tripundra', drape=(214, 110, 40), angry=0.5),
+    'british_officer': dict(gender='m', skin=(236, 196, 170), hair=(120, 80, 40), mustache=True, crown='hat', cloth=(176, 28, 34), buttons=True),
+    'freedom_fighter': dict(gender='m', skin=(186, 128, 90), hair=(20, 16, 16), mustache=True, crown='none', cloth=(236, 232, 220)),
+    'revolutionary':   dict(gender='m', skin=(196, 140, 100), hair=(20, 16, 16), mustache=True, crown='fedora', cloth=(90, 70, 50), young=True),
+    'gandhi_cap':      dict(gender='m', skin=(186, 128, 90), hair=(20, 16, 16), mustache=True, crown='topi', cloth=(236, 232, 220)),
+    'warrior_queen':   dict(gender='f', skin=(214, 158, 118), hair=(22, 18, 18), crown='safa', turban=(232, 120, 30), tilak='bindi', cloth=(150, 30, 50), armor=True),
+    'villager_man':    dict(gender='m', skin=(160, 104, 70), hair=(22, 18, 18), mustache=True, crown='turban', turban=(240, 240, 230), cloth=(210, 200, 180)),
+    'villager_woman':  dict(gender='f', skin=(196, 140, 100), hair=(22, 18, 18), veil=(200, 70, 60), tilak='bindi'),
+    # --- ghost / horror ---
+    'ghost_woman':     dict(gender='f', skin=(214, 226, 222), hair=(10, 10, 14), cloth=(236, 240, 236), glow=(150, 255, 210), ghost=True, angry=0.4, wild_hair=True),
+    'ghost_man':       dict(gender='m', skin=(176, 196, 206), hair=(30, 34, 40), cloth=(70, 80, 96), glow=(150, 255, 210), ghost=True, angry=0.5),
+    'betaal':          dict(gender='m', skin=(150, 186, 150), hair=(236, 236, 230), cloth=(60, 70, 60), glow=(255, 60, 60), ghost=True, fangs=True, angry=0.7, wild_hair=True),
+    'ghost_child':     dict(gender='m', skin=(210, 222, 226), hair=(16, 16, 20), cloth=(220, 226, 230), glow=(150, 255, 210), ghost=True, young=True),
 }
 
 
@@ -134,7 +153,7 @@ def crown_gold(p, c1, c2, jewel, oy=0):
         p.ell(x - 5, 410 + oy, x + 5, 420 + oy, jewel if k % 2 else WHITE)
 
 
-MOODS = {'calm': 0.0, 'angry': 1.0, 'sad': -0.6, 'smile': -0.2, 'shock': -0.8, 'sleep': 0.0, 'sly': 0.6}
+MOODS = {'calm': 0.0, 'angry': 1.0, 'sad': -0.6, 'smile': -0.2, 'shock': -0.8, 'sleep': 0.0, 'sly': 0.6, 'scared': -0.9}
 
 
 def bust(c, mouth=0, blink=False, mood=None):
@@ -152,6 +171,8 @@ def bust(c, mouth=0, blink=False, mood=None):
     # back hair / veil
     if veil:
         p.poly([(200, 470), (520, 470), (560, 1280), (160, 1280)], dk(veil, 0.9))
+    elif c.get('wild_hair'):
+        p.poly([(220, 400), (500, 400), (600, 700), (640, 1100), (520, 1000), (474, 600), (246, 600), (200, 1000), (80, 1100), (120, 700)], hair)
     elif fem:
         p.poly([(222, 430), (498, 430), (540, 760), (560, 1040), (480, 1060), (474, 600), (246, 600), (240, 1060), (160, 1040), (180, 760)], hair)
     else:
@@ -166,6 +187,10 @@ def bust(c, mouth=0, blink=False, mood=None):
         p.poly([(210, 850), (510, 850), (470, 900), (360, 940), (250, 900)], skin)
         p.line([(250, 900), (360, 940), (470, 900)], GOLD, 6)
         p.poly([(420, 860), (600, 880), (720, 1000), (720, 1280), (560, 1280)], dk(body, 0.8))
+    if c.get('buttons'):
+        for y in range(920, 1280, 70):
+            p.ell(350, y, 370, y + 20, GOLD)
+        p.poly([(250, 850), (470, 850), (430, 900), (290, 900)], dk(body, 0.7))
     if c.get('drape'):
         dr = c['drape']
         p.poly([(330, 850), (560, 856), (720, 990), (720, 1280), (300, 1280), (420, 1000)], dr)
@@ -213,6 +238,8 @@ def bust(c, mouth=0, blink=False, mood=None):
     # beard
     if c.get('beard'):
         p.poly([(232, 600), (280, 690), (330, 722), (390, 722), (440, 690), (488, 600), (496, 662), (472, 762), (402, 826), (360, 836), (318, 826), (248, 762), (224, 662)], c['beard'])
+    if c.get('pointed_beard'):
+        p.poly([(300, 700), (420, 700), (380, 830), (360, 860), (340, 830)], c.get('beard') or hair)
     if c.get('goatee'):
         p.poly([(343, 712), (377, 712), (368, 800), (360, 812), (352, 800)], hair)
     # eyes
@@ -296,6 +323,31 @@ def bust(c, mouth=0, blink=False, mood=None):
         p.line([(240, 440), (360, 410), (480, 440)], GOLD, 8)
         p.poly([(340, 418), (360, 378), (380, 418)], GOLD); p.ell(352, 396, 368, 412, RED)
         p.line([(360, 444), (360, 476)], GOLD, 4); p.ell(352, 476, 368, 492, RED)
+    elif cr in ('pagdi', 'safa'):
+        tc = c.get('turban', (230, 120, 40))
+        p.ell(212, 318, 508, 462, tc)
+        for k, y in enumerate((350, 378, 406, 432)):
+            p.arc((222, y - 30, 498, y + 40), 200, 340, dk(tc, 0.78 if k % 2 else 1.15), 7)
+        if cr == 'pagdi':
+            p.poly([(470, 360), (540, 330), (520, 420)], tc)
+            p.ell(345, 352, 375, 382, GOLD); p.ell(353, 360, 367, 374, RED)
+            p.line([(360, 352), (372, 300), (392, 270)], WHITE, 6)
+        else:
+            p.poly([(480, 410), (560, 520), (520, 640), (500, 460)], tc)
+            p.ell(345, 340, 375, 370, GOLD); p.line([(360, 340), (354, 290)], (250, 250, 250), 7)
+    elif cr == 'topi':
+        p.poly([(246, 448), (474, 448), (456, 388), (264, 388)], (246, 246, 240))
+        p.line([(264, 392), (456, 392)], (220, 220, 214), 4)
+    elif cr == 'hat':
+        p.poly([(196, 446), (524, 446), (480, 380), (420, 340), (360, 326), (300, 340), (240, 380)], (24, 22, 26))
+        p.line([(220, 440), (500, 440)], GOLD, 6)
+    elif cr == 'fedora':
+        p.ell(196, 420, 524, 462, (70, 56, 44))
+        p.poly([(262, 444), (458, 444), (446, 350), (360, 330), (274, 350)], (84, 68, 52))
+        p.rect((264, 418, 456, 436), (30, 24, 20))
+    elif cr == 'shikha':
+        p.ell(236, 410, 484, 470, (190, 136, 96))
+        p.line([(360, 420), (372, 370), (400, 340)], hair, 9)
     elif cr == 'turban':
         p.ell(220, 340, 500, 470, c.get('turban', (230, 120, 40)))
         p.arc((220, 340, 500, 470), 190, 350, dk(c.get('turban', (230, 120, 40)), 0.8), 6)
@@ -331,7 +383,7 @@ def figure(c, pose='stand', sil=False, mirror=False, enemy=False, prop='wheel'):
     else:
         p.poly([(156, 300 + oy), (244, 300 + oy), (262, 450 + oy), (138, 450 + oy)], lower)
     p.rect((150, 296 + oy, 250, 312 + oy), cc(GOLD))
-    top = cc(c.get('drape') or c.get('cloth') if (c.get('drape') or fem) else c['skin'])
+    top = cc(c.get('drape') or c.get('cloth') if (c.get('drape') or fem or c.get('crown') in ('hat', 'topi', 'fedora', 'none', 'turban') or c.get('ghost')) and (c.get('drape') or c.get('cloth')) else c['skin'])
     p.poly([(148, 192 + oy), (252, 192 + oy), (242, 302 + oy), (158, 302 + oy)], top)
     if c.get('sash') and not fem:
         p.poly([(150, 196 + oy), (172, 190 + oy), (250, 300 + oy), (228, 302 + oy)], cc(c['sash']))
@@ -371,7 +423,7 @@ def figure(c, pose='stand', sil=False, mirror=False, enemy=False, prop='wheel'):
     else:
         p.line([(156, 200 + oy), (138, 300 + oy), (140, 380 + oy)], skin, aw)
         p.line([(244, 200 + oy), (262, 300 + oy), (260, 380 + oy)], skin, aw)
-        if not fem:
+        if c.get('armor') and not fem:
             p.line([(262, 380 + oy), (300, 160 + oy)], cc((170, 170, 180)), 8)
     if c.get('armor'):
         p.ell(138, 186 + oy, 178, 216 + oy, cc(GOLD)); p.ell(222, 186 + oy, 262, 216 + oy, cc(GOLD))
@@ -397,8 +449,13 @@ def figure(c, pose='stand', sil=False, mirror=False, enemy=False, prop='wheel'):
         p.ell(176, 50 + oy, 224, 104 + oy, hair)
     elif cr == 'tiara':
         p.line([(164, 104 + oy), (200, 96 + oy), (236, 104 + oy)], cc(GOLD), 5)
-    elif cr == 'turban':
-        p.ell(158, 70 + oy, 242, 116 + oy, cc((230, 120, 40)))
+    elif cr in ('turban', 'pagdi', 'safa'):
+        p.ell(156, 64 + oy, 244, 116 + oy, cc(c.get('turban', (230, 120, 40))))
+    elif cr == 'topi':
+        p.poly([(168, 104 + oy), (232, 104 + oy), (226, 82 + oy), (174, 82 + oy)], cc((246, 246, 240)))
+    elif cr in ('hat', 'fedora'):
+        p.ell(150, 92 + oy, 250, 110 + oy, cc((30, 26, 24)))
+        p.poly([(170, 102 + oy), (230, 102 + oy), (222, 64 + oy), (178, 64 + oy)], cc((30, 26, 24)))
     im = p.out(400 * K, 700 * K)
     return ImageOps.mirror(im) if mirror else im
 
@@ -523,11 +580,66 @@ def bg_sky():
     return im
 
 
+def bg_fort_ruins():
+    im = vgrad([(0, (8, 6, 20)), (700, (40, 30, 60)), (1280, (14, 10, 22))]).convert('RGBA')
+    stars(im, 120, 700, 11)
+    glow(im, 520, 220, 90, (230, 230, 255), 110)
+    d = SD(im); d.ellipse([482, 182, 558, 258], fill=(240, 240, 232))
+    wall = (16, 12, 22)
+    d.polygon([(0, 640), (90, 640), (90, 600), (130, 600), (130, 640), (220, 640), (220, 590), (260, 560), (300, 600), (300, 680), (0, 700)], fill=wall)
+    d.polygon([(380, 700), (380, 560), (420, 560), (420, 530), (460, 530), (460, 560), (520, 560), (520, 520), (560, 480), (600, 540), (600, 560), (720, 560), (720, 720)], fill=wall)
+    for x in (430, 560, 640):
+        d.arc([x, 590, x + 60, 690], 180, 360, fill=(60, 50, 80), width=6)
+    d.rectangle([0, 690, W, H], fill=(12, 10, 18))
+    clouds(im, 16, 640, 1200, (150, 170, 190), 70, 21)
+    return im
+
+
+def bg_village_night():
+    im = vgrad([(0, (6, 10, 18)), (700, (24, 36, 50)), (1280, (10, 14, 18))]).convert('RGBA')
+    stars(im, 100, 650, 13)
+    glow(im, 160, 200, 70, (230, 235, 255), 100)
+    d = SD(im); d.ellipse([130, 170, 190, 230], fill=(240, 240, 232))
+    r = random.Random(5)
+    for x in (-40, 160, 420, 600):
+        h = r.randint(140, 190)
+        d.rectangle([x, 760, x + 160, 900], fill=(20, 18, 16))
+        d.polygon([(x - 20, 770), (x + 80, 760 - h * 0.6), (x + 180, 770)], fill=(28, 22, 16))
+    for x in (300, 520):
+        d.ellipse([x - 4, 820, x + 4, 840], fill=(255, 200, 100))
+    glow(im, 300, 830, 50, (255, 170, 60), 120); glow(im, 520, 830, 50, (255, 170, 60), 120)
+    d = SD(im)
+    d.line([(660, 900), (650, 500)], fill=(10, 10, 10), width=18)
+    d.ellipse([520, 380, 760, 560], fill=(10, 14, 12))
+    d.rectangle([0, 900, W, H], fill=(14, 16, 14))
+    clouds(im, 14, 820, 1250, (160, 180, 200), 60, 17)
+    return im
+
+
+def bg_haunted():
+    im = vgrad([(0, (6, 10, 8)), (640, (20, 34, 28)), (1280, (6, 8, 8))]).convert('RGBA')
+    d = SD(im)
+    d.rectangle([250, 220, 470, 560], fill=(30, 50, 60))
+    glow(im, 360, 300, 70, (200, 220, 255), 90)
+    d = SD(im)
+    d.line([(360, 220), (360, 560)], fill=(10, 12, 10), width=10); d.line([(250, 390), (470, 390)], fill=(10, 12, 10), width=10)
+    d.line([(270, 240), (330, 330), (300, 380)], fill=(10, 12, 10), width=3)
+    for x in (60, 620):
+        d.rectangle([x, 120, x + 40, 1280], fill=(14, 20, 18))
+    d.line([(120, 600), (180, 700), (150, 820)], fill=(8, 10, 8), width=4)
+    d.line([(560, 500), (600, 620)], fill=(8, 10, 8), width=4)
+    d.rectangle([0, 1060, W, H], fill=(8, 12, 10))
+    glow(im, 360, 1100, 300, (80, 200, 140), 60)
+    clouds(im, 18, 900, 1260, (120, 200, 160), 70, 23)
+    return im
+
+
 BG_FUNCS = {
     'palace_red': lambda: bg_palace('palace_red'), 'palace_blue': lambda: bg_palace('palace_blue'),
     'temple': lambda: bg_palace('temple'), 'patal': lambda: bg_palace('patal'),
     'battlefield': bg_dusk, 'battlefield_dark': lambda: bg_dusk(True),
     'night': bg_night, 'forest': bg_forest, 'river': bg_river, 'sky': bg_sky,
+    'fort_ruins': bg_fort_ruins, 'village_night': bg_village_night, 'haunted': bg_haunted,
 }
 BACKGROUNDS = tuple(BG_FUNCS)
 

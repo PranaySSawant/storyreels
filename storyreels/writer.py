@@ -68,11 +68,14 @@ def ask_json(system, user, validate, tries=3):
     raise RuntimeError(f'LLM failed validation: {err}')
 
 
-SYSTEM = f"""You write short Hindi (Devanagari) animated reel scripts retelling Indian mythology (Ramayana, Mahabharata, Puranas) faithfully to the traditional telling, respectful in tone, no gore. You always answer with ONE JSON object and nothing else.
+SYSTEM = f"""You write short Hindi (Devanagari) animated reel scripts: Indian mythology, Indian history, and Indian ghost/folk-horror legends. You always answer with ONE JSON object and nothing else.
 
 Rendering vocabulary (use ONLY these values):
 - character presets: {', '.join(PRESETS)}
-  (blue_god = Krishna/Vishnu style; blue_prince = Ram style; vanara = Hanuman/vanaras; sage = rishis/gurus like Drona, Vishwamitra; villain/demon = antagonists; mother = veiled older woman; queen/princess/goddess for women; boy for children)
+  (blue_god = Krishna/Vishnu style; blue_prince = Ram style; vanara = Hanuman/vanaras; sage = rishis/gurus like Drona, Vishwamitra; villain/demon = antagonists; mother = veiled older woman; queen/princess/goddess for women; boy for children;
+   HISTORY: maratha_king = Shivaji-style saffron pagdi + beard; maratha_warrior; rajput_king = safa + beard; emperor = Mughal/sultan style white safa; ancient_king = Maurya/ancient era; chanakya = shaven head with shikha;
+   british_officer = red coat + hat; freedom_fighter = white kurta; gandhi_cap = kurta + white cap; revolutionary = young man with fedora (Bhagat Singh style); warrior_queen = Rani Lakshmibai style; villager_man / villager_woman;
+   GHOST: ghost_woman = pale chudail/white-saree spirit; ghost_man = pale male spirit; betaal = Betaal / brahmarakshas / pishach; ghost_child)
 - optional character overrides: skin, hair, beard, sash, cloth, drape as hex like "#c08050"; crown one of gold|dark|jata|feather|tiara|turban|none; glow hex (glowing eyes for divine/demonic)
 - voices: {', '.join(VOICE_STYLES)}  (narrator is reserved for the narrator)
 - backgrounds: {', '.join(BACKGROUNDS)}
@@ -80,6 +83,10 @@ Rendering vocabulary (use ONLY these values):
   bust   -> {{"type":"bust","char":ID,"bg":BG,"mood":MOOD}}  close-up of one character; moods: {', '.join(MOODS)}
   wide   -> {{"type":"wide","bg":BG,"hero":ID,"pose":POSE,"with":ID or null,"enemies":0-6,"arrows":bool,"flash":bool,"silhouette":bool,"prop":"wheel"|"rock"}}  poses: {', '.join(POSES)} ("raise" lifts the prop overhead; silhouette=true is a dramatic sunset silhouette)
   symbol -> {{"type":"symbol","kind":"spiral"|"fire"|"rays"|"lotus"|"storm","bg":BG}}  for formations, fire, divine light, storms
+Genre rules:
+- myth: faithful to the traditional telling, respectful.
+- history: stick to recorded facts with real years and places; anything legendary must be framed as "कहा जाता है..." / "किंवदंती है..."; neutral tone, never communal or hateful toward any religion or community; no glorified gore.
+- ghost: spooky, suspenseful, Instagram-safe (no gore, no self-harm); present it as a legend/folk belief ("लोग कहते हैं...", "कहा जाता है..."), never as proven fact; use backgrounds night, haunted, fort_ruins, village_night, forest; moods scared/shock; end parts on a chilling cliffhanger.
 Text rules: every spoken line is Hindi Devanagari, max 18 words, punchy, dramatic, simple words. Wrap 1-2 key words per line in *asterisks* (they render gold). Use "..." for dramatic pauses."""
 
 
@@ -97,9 +104,10 @@ def validate_plan(p):
         assert part['summary']
 
 
-def plan_series(title, brief):
+def plan_series(title, brief, genre='myth'):
     user = f"""Plan a multi-part Instagram reel series for this story:
 Title: {title}
+Genre: {genre}
 Brief: {brief}
 
 Split it into 2-5 parts (each part ~45-70 seconds of narration+dialogue), each ending on a cliffhanger except the last.
@@ -133,11 +141,12 @@ def make_validate_episode(chars):
     return v
 
 
-def write_episode(plan, part_no, prev_summary=None):
+def write_episode(plan, part_no, prev_summary=None, genre='myth'):
     chars = plan['characters']
     part = plan['parts'][part_no - 1]
     last = part_no == int(plan['total_parts'])
-    user = f"""Series: {plan['story_title']} — part {part_no} of {plan['total_parts']}.
+    user = f"""Genre: {genre} (follow the genre rules).
+Series: {plan['story_title']} — part {part_no} of {plan['total_parts']}.
 All parts: {json.dumps([p['summary'] for p in plan['parts']], ensure_ascii=False)}
 This part: {part['summary']}
 {'Previous part ended with: ' + prev_summary if prev_summary else ''}
@@ -153,13 +162,18 @@ Write this part. Return JSON:
   "summary_for_next": "one English sentence: how this part ended"
 }}"""
     ep = ask_json(SYSTEM, user, make_validate_episode(chars))
-    ep.update(story_title=plan['story_title'], part=part_no, total_parts=int(plan['total_parts']),
+    ep.update(genre=genre, story_title=plan['story_title'], part=part_no, total_parts=int(plan['total_parts']),
               characters=chars, main_character=plan.get('main_character'))
     return ep
 
 
-def new_story_idea(done_titles):
-    user = f"""Suggest one well-known Indian mythology story (Ramayana, Mahabharata, Puranas, Upanishads, Jataka, folk legends of saints) that is NOT in this list: {json.dumps(done_titles, ensure_ascii=False)}.
+GENRE_HINT = {'myth': 'Indian mythology story (Ramayana, Mahabharata, Puranas, Upanishads, Jataka, legends of saints)',
+              'history': 'true Indian historical story (ancient to freedom struggle) with real people, years and places',
+              'ghost': 'famous Indian ghost legend, haunted place or folk-horror tale'}
+
+
+def new_story_idea(done_titles, genre='myth'):
+    user = f"""Suggest one well-known {GENRE_HINT.get(genre, GENRE_HINT['myth'])} that is NOT in this list: {json.dumps(done_titles, ensure_ascii=False)}.
 Return JSON: {{"id": "short_latin_id", "title": "Hindi title", "brief": "one-line English summary"}}"""
     def v(d):
         assert d['id'] and d['title'] and d['brief']

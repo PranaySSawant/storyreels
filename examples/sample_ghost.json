@@ -1,0 +1,20 @@
+{
+  "genre": "ghost", "story_id": "shaniwar_wada", "story_title": "शनिवार वाड़ा", "part": 1, "total_parts": 2,
+  "main_character": "narayan",
+  "hook": "क्या आप जानते हैं, पुणे के *शनिवार वाड़ा* में पूर्णिमा की रात कौन *चीखता* है?",
+  "hook_bg": "fort_ruins",
+  "characters": {
+    "narayan": {"name": "नारायणराव", "preset": "ghost_child", "voice": "child"},
+    "guard": {"name": "पहरेदार", "preset": "maratha_warrior", "voice": "man"}
+  },
+  "scenes": [
+    {"speaker": "narrator", "text": "सन *1773*... पुणे का शनिवार वाड़ा, पेशवाओं का महल।", "shot": {"type": "bust", "char": "guard", "bg": "fort_ruins", "mood": "calm"}},
+    {"speaker": "narrator", "text": "सोलह साल के पेशवा *नारायणराव* की महल में ही हत्या हो गई।", "shot": {"type": "symbol", "kind": "storm", "bg": "night"}},
+    {"speaker": "guard", "text": "मैंने सुना है... आख़िरी बार वो अपने *काका* को पुकार रहे थे।", "shot": {"type": "bust", "char": "guard", "bg": "village_night", "mood": "scared"}},
+    {"speaker": "narrator", "text": "लोग कहते हैं, आज भी *पूर्णिमा* की रात वाड़े से एक आवाज़ आती है...", "shot": {"type": "wide", "bg": "fort_ruins", "hero": "guard", "pose": "stand"}},
+    {"speaker": "narayan", "text": "*काका*... मला वाचवा!", "shot": {"type": "bust", "char": "narayan", "bg": "haunted", "mood": "scared"}},
+    {"speaker": "guard", "text": "ये आवाज़... ये तो *अंदर* से आ रही है!", "shot": {"type": "bust", "char": "guard", "bg": "haunted", "mood": "shock"}}
+  ],
+  "cliffhanger": {"text": "पर उस रात पहरेदार ने जो *देखा*... वो किसी ने नहीं सोचा था।", "card": "पूर्णिमा की रात"},
+  "caption": "शनिवार वाड़ा भाग 1 | पूर्णिमा की रात कौन चीखता है? 👻", "hashtags": ["#shaniwarwada", "#horrorstories", "#pune", "#bhootkahani"]
+}

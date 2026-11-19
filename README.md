@@ -113,7 +113,7 @@ tail -f data/pipeline.log
 Change the schedule with `crontab -e`.
 
 ## Customise
-- **Stories:** edit `catalog.py`, as `(id, Hindi title, English brief)`.
+- **Stories:** edit `catalog.py`. It has 3 lists (`MYTH`, `HISTORY`, `GHOST`), and runs rotate myth → history → ghost.
 - **Look:** character presets, backgrounds and shot types live in `art.py`. The LLM is told the allowed values in `writer.py`.
 - **Voices:** `VOICE_STYLES` in `tts.py`, which sets the model, pitch and speed per character type.
 - **Better voices:** replace `tts.synth()` with ElevenLabs, Azure or Google Hindi TTS. It only has to write a 44.1 kHz mono wav and return its duration.

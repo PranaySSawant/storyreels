@@ -60,11 +60,16 @@ def save(st):
 
 def next_story(st):
     done = set(st['done'])
-    for sid, title, brief in catalog.STORIES:
-        if sid not in done:
-            return sid, title, brief
-    idea = writer.new_story_idea([d for d in st['done']])
-    return idea['id'], idea['title'], idea['brief']
+    order = catalog.ORDER
+    last = st.get('last_genre')
+    start = (order.index(last) + 1) % len(order) if last in order else 0
+    for g in order[start:] + order[:start]:
+        for sid, title, brief in catalog.GENRES[g]:
+            if sid not in done:
+                return sid, title, brief, g
+    g = order[start]
+    idea = writer.new_story_idea(list(st['done']), g)
+    return idea['id'], idea['title'], idea['brief'], g
 
 
 def caption_for(ep):
@@ -77,16 +82,18 @@ def cycle(st, dry=False):
     if not cur or cur['next_part'] > cur['plan']['total_parts']:
         if cur:
             st['done'].append(cur['id'])
-        sid, title, brief = next_story(st)
-        log(f'new story: {sid} {title}')
-        plan = writer.plan_series(title, brief)
-        cur = st['current'] = {'id': sid, 'title': title, 'plan': plan, 'next_part': 1, 'prev_summary': None, 'pending': None}
+            st['last_genre'] = cur.get('genre') or st.get('last_genre') or 'myth'
+        sid, title, brief, genre = next_story(st)
+        log(f'new story [{genre}]: {sid} {title}')
+        plan = writer.plan_series(title, brief, genre)
+        st['last_genre'] = genre
+        cur = st['current'] = {'id': sid, 'title': title, 'genre': genre, 'plan': plan, 'next_part': 1, 'prev_summary': None, 'pending': None}
         save(st)
     n = cur['next_part']
     pend = cur.get('pending')
     if not pend:
         log(f"writing {cur['id']} part {n}/{cur['plan']['total_parts']}")
-        ep = writer.write_episode(cur['plan'], n, cur.get('prev_summary'))
+        ep = writer.write_episode(cur['plan'], n, cur.get('prev_summary'), cur.get('genre', 'myth'))
         ep['story_id'] = cur['id']
         pend = cur['pending'] = {'episode': ep, 'mp4': None}
         save(st)

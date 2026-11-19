@@ -1,5 +1,6 @@
-"""Story catalog. Add/remove freely; the pipeline goes through it in order, then asks the LLM for new ones."""
-STORIES = [
+"""Story catalog: (id, Hindi title, English brief). The pipeline rotates genres myth -> history -> ghost
+and takes the next unused story of each; when a genre runs out the LLM suggests new ones."""
+MYTH = [
     ("chakravyuh", "अभिमन्यु और चक्रव्यूह", "Mahabharata: Abhimanyu enters Drona's Chakravyuh on day 13 and dies fighting seven maharathis"),
     ("ahiravan", "अहिरावण वध", "Ramayana: Ahiravan abducts Ram and Lakshman to Patal; Hanuman meets Makardhwaj and slays Ahiravan"),
     ("karna_kavach", "कर्ण का कवच-कुंडल", "Mahabharata: Indra disguised as a brahmin asks Karna for his divine armour and earrings"),
@@ -31,3 +32,52 @@ STORIES = [
     ("kaliya", "कालिया मर्दन", "Bhagavata: Young Krishna dances on the serpent Kaliya in the Yamuna"),
     ("govardhan", "गोवर्धन पर्वत", "Bhagavata: Krishna lifts Govardhan to shelter Vrindavan from Indra's storm"),
 ]
+
+HISTORY = [
+    ("afzal_khan", "शिवाजी महाराज और अफ़ज़ल ख़ान", "1659: Afzal Khan's invitation to Pratapgad, the embrace, the wagh-nakh, the Maratha victory"),
+    ("agra_escape", "आगरा से पलायन", "1666: Shivaji under house arrest at Aurangzeb's Agra, feigned illness, escape in sweet baskets"),
+    ("tanaji", "तानाजी और सिंहगढ़", "1670: Tanaji Malusare climbs Kondhana at night (legend of the monitor lizard), dies winning it; 'Gad aala pan Sinha gela'"),
+    ("pavankhind", "बाजी प्रभु और पावनखिंड", "1660: Baji Prabhu Deshpande holds Ghod Khind with 300 men until Shivaji reaches Vishalgad"),
+    ("ahilyabai", "अहिल्याबाई होल्कर", "Malwa's queen: loss of husband and son, just rule from Maheshwar, rebuilding temples across India"),
+    ("haldighati", "महाराणा प्रताप और हल्दीघाटी", "1576: Battle of Haldighati, Chetak's leap and death, Pratap's lifelong resistance"),
+    ("prithviraj", "पृथ्वीराज चौहान", "Battles of Tarain 1191-92; the bard Chand Bardai's legend of the blind archer (mark as legend)"),
+    ("rani_durgavati", "रानी दुर्गावती", "1564: Gond queen of Garha-Katanga fights Asaf Khan's Mughal army, chooses death over capture"),
+    ("lachit", "लाचित बोड़फुकन", "1671: Battle of Saraighat on the Brahmaputra; ill Lachit leads the Ahom navy to victory"),
+    ("raja_raja_chola", "राजराज चोल और समुद्र", "Chola emperor Rajaraja I builds Brihadeeswara temple and a navy reaching Sri Lanka and the Maldives"),
+    ("chanakya", "चाणक्य और चंद्रगुप्त", "Chanakya insulted in the Nanda court, unties his shikha vow, finds young Chandragupta, founds the Maurya empire"),
+    ("ashoka", "सम्राट अशोक और कलिंग", "Kalinga war (c. 261 BCE), the bloodshed, Ashoka's change of heart and edicts of dhamma"),
+    ("porus", "पोरस और सिकंदर", "326 BCE Battle of the Hydaspes; captured Porus asks to be treated as a king (as told by Greek historians)"),
+    ("lakshmibai", "रानी लक्ष्मीबाई", "1857-58: Jhansi under siege, escape with son Damodar on horseback, last stand at Gwalior"),
+    ("mangal_pandey", "मंगल पांडे", "29 March 1857, Barrackpore: Mangal Pandey's revolt that sparked 1857"),
+    ("bhagat_singh", "भगत सिंह", "Saunders case, Central Assembly bomb 1929, hunger strike, execution 23 March 1931 with Rajguru and Sukhdev"),
+    ("azad", "चंद्रशेखर आज़ाद", "The boy who told the court his name was 'Azad'; Kakori; last stand at Alfred Park 1931"),
+    ("netaji_escape", "नेताजी का महा-पलायन", "1941: Subhas Chandra Bose escapes house arrest in Kolkata disguised as a Pathan, reaches Germany"),
+    ("tenali", "तेनाली रामा की चतुराई", "Folk tales of Tenali Rama's wit at Krishnadevaraya's court (mark as folk tales)"),
+]
+
+GHOST = [
+    ("vikram_betaal", "विक्रम और बेताल", "King Vikramaditya carries Betaal from the tree; Betaal tells a riddle story; if Vikram speaks, Betaal flies back"),
+    ("bhangarh", "भानगढ़ का श्राप", "Legend of Bhangarh fort, Rajasthan: the tantrik Singhia and princess Ratnavati, the curse, the abandoned town"),
+    ("kuldhara", "कुलधरा का रहस्य", "Legend: Paliwal Brahmins abandon Kuldhara village in one night and curse it so no one can settle again"),
+    ("shaniwar_wada", "शनिवार वाड़ा की चीख", "1773 murder of young Peshwa Narayanrao; legend says his cry 'Kaka mala vachva' echoes on full-moon nights"),
+    ("dumas_beach", "डुमस बीच की फुसफुसाहट", "Legend of Dumas beach, Surat: black sand, old cremation ground, whispers and missing walkers"),
+    ("dow_hill", "डाउ हिल का सिरकटा लड़का", "Kurseong's Dow Hill forest: legend of a headless boy walking the road and the 'death road' stretch"),
+    ("roopkund", "रूपकुंड की कंकाल झील", "Himalayan lake full of ancient skeletons; folk legend of Nanda Devi's wrath and the hailstorm (history + legend)"),
+    ("jatinga", "जटिंगा का रहस्य", "Assam village where birds fall from the sky on misty autumn nights; local spirit legends vs science"),
+    ("agrasen_baoli", "अग्रसेन की बावली", "Delhi stepwell legend: dark water that 'calls' people down the 108 steps"),
+    ("savoy_mussoorie", "सवॉय होटल का भूत", "1911 poisoning of Lady Garnet Orme at Mussoorie's Savoy; her ghost said to roam the corridors"),
+    ("brij_raj_bhawan", "बृज राज भवन का मेजर", "Kota palace legend: ghost of a British major killed in 1857 who slaps sleeping guards"),
+    ("nale_ba", "नाले बा — कल आना", "Karnataka 1990s legend: a witch knocks at night calling in a loved one's voice; families write 'Nale Ba' (come tomorrow)"),
+    ("chudail_peepal", "पीपल वाली चुड़ैल", "North Indian village folk tale: the chudail with reversed feet under the peepal tree at night"),
+    ("brahmarakshas", "ब्रह्मराक्षस का कुआँ", "Folk tale of a learned man's spirit trapped as a Brahmarakshas in an old well, freed by a clever student's question"),
+    ("gp_block", "जीपी ब्लॉक मेरठ", "Meerut urban legend: an abandoned house where people report seeing figures by candlelight"),
+    ("mukesh_mills", "मुकेश मिल्स", "Mumbai's abandoned seaside mill, film shoots and the stories of possession told by crew"),
+    ("pishach_jungle", "पिशाच का जंगल", "Folk tale of travellers lost in a forest where a pishach imitates human voices"),
+    ("dakini_haveli", "हवेली की डाकिनी", "Rajasthan folk tale of a haveli where a mirror shows a woman who is not in the room"),
+    ("ghost_train", "आख़िरी लोकल", "Railway legend of the last night train whose passengers vanish at a deserted station"),
+    ("lambi_dehar", "लांबी देहार माइंस", "Mussoorie mine legend: thousands of miners died; a witch spirit said to haunt the hill"),
+]
+
+GENRES = {'myth': MYTH, 'history': HISTORY, 'ghost': GHOST}
+ORDER = ['myth', 'history', 'ghost']
+STORIES = [(i, t, b) for g in ORDER for i, t, b in GENRES[g]]
