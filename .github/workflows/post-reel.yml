@@ -1,4 +1,4 @@
-name: post-reel
+name: make-reel
 
 on:
   schedule:
@@ -67,6 +67,11 @@ jobs:
           IG_API_HOST: ${{ vars.IG_API_HOST || 'graph.instagram.com' }}
           STATE_KEY: ${{ secrets.STATE_KEY }}
           WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}      # Make/Zapier mode (then IG_* secrets are not needed)
+          MAIL_TO: ${{ secrets.MAIL_TO }}              # email mode: release + email download links, no auto-posting
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          SMTP_HOST: ${{ vars.SMTP_HOST || 'smtp.gmail.com' }}
+          SMTP_PORT: ${{ vars.SMTP_PORT || '465' }}
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
