@@ -3,14 +3,32 @@ import os, json, re, time, requests
 from .art import PRESETS, BACKGROUNDS, POSES, MOODS
 from .tts import VOICE_STYLES
 
-PROVIDER = os.environ.get('LLM_PROVIDER', 'anthropic')
+PROVIDER = (os.environ.get('LLM_PROVIDER') or ('groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
+GROQ_PREFERRED = ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
+_groq_model = None
+
+
+def groq_model():
+    global _groq_model
+    if _groq_model:
+        return _groq_model
+    if os.environ.get('GROQ_MODEL'):
+        _groq_model = os.environ['GROQ_MODEL']; return _groq_model
+    try:
+        r = requests.get('https://api.groq.com/openai/v1/models', timeout=30, headers={'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}"})
+        ids = [m['id'] for m in r.json().get('data', [])]
+        _groq_model = next((m for m in GROQ_PREFERRED if m in ids), ids[0] if ids else GROQ_PREFERRED[0])
+    except Exception:
+        _groq_model = GROQ_PREFERRED[0]
+    print('groq model:', _groq_model)
+    return _groq_model
 
 
 def llm(system, user, max_tokens=4000):
     if PROVIDER == 'groq':
         r = requests.post('https://api.groq.com/openai/v1/chat/completions', timeout=120,
                           headers={'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}"},
-                          json={'model': os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'), 'max_tokens': max_tokens, 'temperature': 0.8,
+                          json={'model': groq_model(), 'max_tokens': max_tokens, 'temperature': 0.8,
                                 'response_format': {'type': 'json_object'},
                                 'messages': [{'role': 'system', 'content': system}, {'role': 'user', 'content': user}]})
         if r.status_code >= 400:
