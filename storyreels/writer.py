@@ -13,13 +13,15 @@ def llm(system, user, max_tokens=4000):
                           json={'model': os.environ.get('GROQ_MODEL', 'llama-3.3-70b-versatile'), 'max_tokens': max_tokens, 'temperature': 0.8,
                                 'response_format': {'type': 'json_object'},
                                 'messages': [{'role': 'system', 'content': system}, {'role': 'user', 'content': user}]})
-        r.raise_for_status()
+        if r.status_code >= 400:
+            raise RuntimeError(f'Groq API {r.status_code}: {r.text[:500]}')
         return r.json()['choices'][0]['message']['content']
     r = requests.post('https://api.anthropic.com/v1/messages', timeout=180,
                       headers={'x-api-key': os.environ['ANTHROPIC_API_KEY'], 'anthropic-version': '2023-06-01', 'content-type': 'application/json'},
                       json={'model': os.environ.get('ANTHROPIC_MODEL', 'claude-sonnet-5-5'), 'max_tokens': max_tokens, 'system': system,
                             'messages': [{'role': 'user', 'content': user}]})
-    r.raise_for_status()
+    if r.status_code >= 400:
+        raise RuntimeError(f'Anthropic API {r.status_code}: {r.text[:500]}')
     return ''.join(b.get('text', '') for b in r.json()['content'])
 
 
