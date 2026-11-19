@@ -16,6 +16,7 @@ concurrency:
 
 permissions:
   contents: write                  # push the 'state' and 'media' branches
+  actions: write                   # let each run start the next one (self-scheduling chain)
 
 jobs:
   reel:
@@ -121,3 +122,25 @@ jobs:
             data/pipeline.log
           retention-days: 3
           if-no-files-found: ignore
+
+  # GitHub's cron is unreliable on this repo, so each run starts the next one itself:
+  # wait until INTERVAL_MIN after this run started, then dispatch the workflow again.
+  # (workflow_dispatch from GITHUB_TOKEN is allowed to start new runs; public repo = free minutes)
+  next:
+    needs: reel
+    if: always() && github.event_name == 'workflow_dispatch' && inputs.dry_run != true && vars.CHAIN != 'off'
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Wait, then start the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INTERVAL_MIN: ${{ vars.INTERVAL_MIN || '60' }}
+        run: |
+          started=$(gh api repos/${{ github.repository }}/actions/runs/${{ github.run_id }} --jq .run_started_at)
+          elapsed=$(( $(date +%s) - $(date -d "$started" +%s) ))
+          wait=$(( INTERVAL_MIN * 60 - elapsed ))
+          echo "run started $started, waiting ${wait}s"
+          [ "$wait" -gt 0 ] && sleep "$wait"
+          gh workflow run post-reel.yml --repo ${{ github.repository }} --ref main -f dry_run=false
+          echo "next run dispatched"
