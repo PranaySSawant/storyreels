@@ -61,6 +61,7 @@ def deliver(ep, mp4, master, cover, caption, key, log=print):
 <pre style="white-space:pre-wrap;background:#f4f4f4;padding:12px;border-radius:8px">{html.escape(caption)}</pre>
 <p><a href="{page}">Release page</a></p></div>"""
     text = f"{title}\n\n" + '\n'.join(f'{l}: {u}' for l, u in links.items()) + f"\n\nCaption:\n{caption}\n\n{page}"
-    send_mail(f'🎬 Reel ready: {title}', text, html_body)
-    log(f"emailed {os.environ['MAIL_TO']}")
+    if os.environ.get('MAIL_TO') and os.environ.get('SMTP_PASS'):
+        send_mail(f'🎬 Reel ready: {title}', text, html_body)
+        log(f"emailed {os.environ['MAIL_TO']}")
     return 'email', links.get('reel_1080p', page)

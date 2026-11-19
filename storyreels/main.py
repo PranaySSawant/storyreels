@@ -102,15 +102,15 @@ def cycle(st, dry=False):
     if dry:
         log('dry run: not posting'); return pend['mp4']
     key = os.path.basename(pend['mp4'])[:-4]
-    if os.environ.get('MAIL_TO'):
+    if os.environ.get('WEBHOOK_URL'):
+        mid, link = publish.publish_via_webhook(pend['mp4'], pend.get('cover'), caption_for(ep), key,
+                                                meta={'story': cur['id'], 'part': n, 'total_parts': ep.get('total_parts')}, log=log)
+    elif os.environ.get('IG_USER_ID'):
+        mid, link = publish.publish_reel(pend['mp4'], pend.get('cover'), caption_for(ep), key, log=log)
+    else:  # default: GitHub Release (download links) + optional email
         master = pend['mp4'][:-4] + '_4k.mp4'
         mid, link = notify.deliver(ep, pend['mp4'], master if os.path.exists(master) else None, pend.get('cover'),
                                    caption_for(ep), key, log=log)
-    elif os.environ.get('WEBHOOK_URL'):
-        mid, link = publish.publish_via_webhook(pend['mp4'], pend.get('cover'), caption_for(ep), key,
-                                                meta={'story': cur['id'], 'part': n, 'total_parts': ep.get('total_parts')}, log=log)
-    else:
-        mid, link = publish.publish_reel(pend['mp4'], pend.get('cover'), caption_for(ep), key, log=log)
     log(f'posted {mid} {link}')
     st['posts'].append({'t': int(time.time()), 'story': cur['id'], 'part': n, 'media_id': mid, 'link': link})
     cur['prev_summary'] = ep.get('summary_for_next')
@@ -151,7 +151,7 @@ def main():
         if st['current']:
             st['done'].append(st['current']['id']); st['current'] = None; save(st)
         return
-    if a.cmd == 'refresh-token' or not a.dry_run and not os.environ.get('WEBHOOK_URL') and not os.environ.get('MAIL_TO') and time.time() - st.get('token_refreshed', 0) > 6 * 86400:
+    if a.cmd == 'refresh-token' or not a.dry_run and os.environ.get('IG_USER_ID') and not os.environ.get('WEBHOOK_URL') and time.time() - st.get('token_refreshed', 0) > 6 * 86400:
         try:
             if publish.refresh_token() is not None:
                 st['token_refreshed'] = int(time.time()); save(st); log('access token refreshed')

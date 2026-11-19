@@ -32,8 +32,11 @@ The workflow `.github/workflows/post-reel.yml` runs every 30 min:
 
 **Use a public repo.** Standard runners are free there, and the raw media URL only works for public repos.
 
-### Email mode (current setup): make the reel, email the download links, post manually
-Add these secrets. With `MAIL_TO` set, nothing is posted to Instagram:
+### Default mode: make the reel, publish it as a GitHub Release, post manually
+The only secret you need is `ANTHROPIC_API_KEY`. Each run creates a **Release** with the 1080p reel, the 4K master, the cover and the caption.
+To get an email for every reel: open the repo → **Watch → Custom → Releases** → Apply. GitHub then emails your account address.
+
+Optional: send your own email instead, with the caption in the body. Add these secrets:
 | Secret | Value |
 |---|---|
 | `ANTHROPIC_API_KEY` | Anthropic key (or `GROQ_API_KEY` + variable `LLM_PROVIDER=groq`) |
