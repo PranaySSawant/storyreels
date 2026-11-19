@@ -29,6 +29,9 @@ def synth(text, style, out_wav):
     """write 44.1k mono wav, return duration seconds"""
     from piper import SynthesisConfig
     model, semi, speed, extra = VOICE_STYLES.get(style, VOICE_STYLES['man'])
+    if not any(ch.isalpha() for ch in text):     # nothing speakable -> short silence instead of crashing
+        subprocess.run(['ffmpeg', '-v', 'error', '-y', '-f', 'lavfi', '-i', 'anullsrc=r=44100:cl=mono', '-t', '0.6', out_wav], check=True)
+        return 0.6
     v = _voice(model)
     raw = out_wav + '.raw.wav'
     with wave.open(raw, 'wb') as w:

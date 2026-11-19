@@ -73,6 +73,7 @@ def comp(im, layer):
 class Episode:
     def __init__(self, ep, workdir):
         self.ep = ep; self.wd = workdir
+        self.genre = ep.get('genre') if ep.get('genre') in ('myth', 'history', 'ghost') else 'myth'
         os.makedirs(workdir, exist_ok=True)
         self.chars = {k: dict(v) for k, v in ep.get('characters', {}).items()}
         self.params = {k: art.char_params(v) for k, v in self.chars.items()}
@@ -84,6 +85,31 @@ class Episode:
         cl = ep.get('cliffhanger', {})
         L.append(dict(speaker='narrator', text=cl.get('text', 'अगले भाग में...'), shot=dict(type='end', card=cl.get('card', ''))))
         self.lines = L
+        self.clean_shots()
+
+    SYMBOLS = {'myth': ('spiral', 'fire', 'rays', 'lotus', 'storm'),
+               'history': ('fort', 'fire', 'storm', 'rays'),
+               'ghost': ('tree', 'moon', 'eyes', 'storm', 'fire')}
+    DEFAULT_SYMBOL = {'myth': 'rays', 'history': 'fort', 'ghost': 'tree'}
+
+    def clean_shots(self):
+        """Keep the reel on-theme: genre-appropriate symbols, at most 2 wide shots, wide only for real action."""
+        g = self.genre
+        wides = 0
+        for i, l in enumerate(self.lines):
+            sh = l['shot']
+            if sh['type'] == 'symbol' and sh['kind'] not in self.SYMBOLS[g]:
+                sh['kind'] = self.DEFAULT_SYMBOL[g]
+            if sh['type'] == 'wide':
+                action = sh.get('enemies') or sh.get('arrows') or sh.get('silhouette') or sh.get('with') or sh.get('pose') not in ('stand', None)
+                wides += 1
+                if not action or wides > 2:
+                    sp = l['speaker']
+                    cid = sp if sp in self.chars else sh['hero']
+                    mood = 'scared' if g == 'ghost' else ('angry' if sh.get('enemies') else 'calm')
+                    l['shot'] = sh = dict(type='bust', char=cid, bg=sh['bg'], mood=mood)
+                elif g == 'ghost':
+                    sh['flash'] = False; sh['arrows'] = False
 
     def fix_shot(self, sh, scene):
         sh = dict(sh)
@@ -105,7 +131,7 @@ class Episode:
             if sh.get('pose') not in art.POSES:
                 sh['pose'] = 'stand'
             sh['enemies'] = max(0, min(6, int(sh.get('enemies', 0) or 0)))
-        if t == 'symbol' and sh.get('kind') not in ('spiral', 'fire', 'rays', 'lotus', 'storm'):
+        if t == 'symbol' and sh.get('kind') not in ('spiral', 'fire', 'rays', 'lotus', 'storm', 'tree', 'moon', 'eyes', 'fort'):
             sh['kind'] = 'rays'
         return sh
 
@@ -320,6 +346,13 @@ class Episode:
     def paste_feet(base, spr, cx, feet_y):
         base.alpha_composite(spr, (int(cx * K - spr.width / 2), int(feet_y * K - 670 * spr.height / 700)))
 
+    def night_sky(self):
+        if 'night_sky' not in self.bg:
+            im = art.vgrad([(0, (4, 8, 22)), (700, (18, 28, 58)), (1280, (12, 18, 40))]).convert('RGBA')
+            art.stars(im, 140, 900, 5)
+            self.bg['night_sky'] = im
+        return self.bg['night_sky'].copy()
+
     def symbol(self, kind, ts, bgk):
         im = self.BG(bgk).copy()
         d = art.SD(im)
@@ -358,6 +391,61 @@ class Episode:
             im.alpha_composite(lay.filter(ImageFilter.GaussianBlur(3 * K)))
             art.glow(im, 360, 1100, 300, (255, 120, 30), 120)
             self.embers(im, ts, 11, 60)
+        elif kind == 'tree':   # haunted banyan in moonlight
+            im = self.night_sky(); d = art.SD(im)
+            art.glow(im, 470, 330, 160, (220, 230, 255), 130); d = art.SD(im)
+            d.ellipse([400, 260, 540, 400], fill=(236, 238, 230))
+            sway = 6 * math.sin(ts * 0.8)
+            blk = (6, 8, 8)
+            d.polygon([(300, 1280), (330, 760), (300, 600), (360, 640), (400, 560), (420, 760), (450, 1280)], fill=blk)
+            for x0, y0, x1, y1 in ((330, 640, 120, 470), (390, 600, 640, 430), (360, 620, 260, 380), (400, 620, 560, 560)):
+                d.line([(x0, y0), ((x0 + x1) / 2, (y0 + y1) / 2 - 30), (x1 + sway, y1)], fill=blk, width=26)
+            d.ellipse([20, 260, 420, 560], fill=blk); d.ellipse([300, 220, 720, 520], fill=blk); d.ellipse([160, 160, 560, 420], fill=blk)
+            r = random.Random(4)
+            for _ in range(26):
+                x = r.uniform(60, 680); y = r.uniform(420, 520); L = r.uniform(120, 420)
+                d.line([(x, y), (x + sway * 0.6, y + L)], fill=blk, width=3)
+            d.rectangle([0, 1160, W, H], fill=(4, 6, 6))
+            self.fog(im, ts)
+        elif kind == 'moon':   # huge moon, bats
+            im = self.night_sky()
+            art.glow(im, 360, 560, 300, (230, 235, 255), 150)
+            d = art.SD(im); d.ellipse([140, 340, 580, 780], fill=(240, 240, 228))
+            d.ellipse([260, 450, 320, 500], fill=(220, 220, 206)); d.ellipse([400, 600, 470, 650], fill=(222, 222, 208))
+            r = random.Random(8)
+            for k in range(9):
+                ph = r.uniform(0, 6.28); sp = r.uniform(30, 70)
+                x = (r.uniform(0, W) + ts * sp) % (W + 100) - 50; y = r.uniform(300, 900) + 30 * math.sin(ts * 2 + ph)
+                f = 14 * abs(math.sin(ts * 9 + ph)) + 4; sz = r.uniform(14, 26)
+                d.polygon([(x, y), (x - sz, y - f), (x - sz * 1.6, y + 4), (x, y + 6), (x + sz * 1.6, y + 4), (x + sz, y - f)], fill=(8, 8, 12))
+            d.rectangle([0, 1100, W, H], fill=(6, 8, 10))
+        elif kind == 'eyes':   # glowing eyes in darkness
+            im = Image.new('RGBA', (OW, OH)); im.paste(art.vgrad([(0, (2, 4, 4)), (1280, (8, 14, 12))]))
+            d = art.SD(im); r = random.Random(12)
+            for k in range(14):
+                x = r.uniform(80, 640); y = r.uniform(200, 1100); sz = r.uniform(6, 16); ph = r.uniform(0, 3.4)
+                if ((ts + ph) % 3.4) < 0.15:
+                    continue
+                c = (120, 255, 190) if k % 3 else (255, 70, 60)
+                for dx in (-sz * 1.6, sz * 1.6):
+                    d.ellipse([x + dx - sz, y - sz * 0.5, x + dx + sz, y + sz * 0.5], fill=c)
+            art.glow(im, 360, 700, 300, (60, 160, 120), 40)
+            self.fog(im, ts)
+        elif kind == 'fort':   # hill fort with waving flags at dusk
+            im = self.BG('battlefield').copy(); d = art.SD(im)
+            wall = (40, 16, 12)
+            d.polygon([(0, 900), (140, 640), (300, 560), (480, 600), (620, 520), (720, 560), (720, 1280), (0, 1280)], fill=(34, 14, 10))
+            d.rectangle([140, 470, 600, 620], fill=wall)
+            for x in range(140, 600, 40):
+                d.rectangle([x, 450, x + 22, 472], fill=wall)
+            for x in (160, 340, 540):
+                d.rectangle([x, 380, x + 70, 620], fill=wall)
+                d.polygon([(x - 8, 384), (x + 35, 330), (x + 78, 384)], fill=wall)
+                fx = x + 35; wv = 10 * math.sin(ts * 5 + x)
+                d.line([(fx, 330), (fx, 250)], fill=(20, 10, 8), width=4)
+                d.polygon([(fx, 252), (fx + 60, 262 + wv), (fx + 52, 282 + wv * 0.6), (fx, 290)], fill=(240, 120, 30))
+            d.arc([320, 540, 420, 640], 180, 360, fill=(14, 6, 4), width=8)
+            self.embers(im, ts, 15, 30)
         elif kind == 'storm':
             im = Image.new('RGBA', (OW, OH)); im.paste(art.vgrad([(0, (8, 8, 16)), (1280, (30, 30, 50))]))
             art.clouds(im, 22, 0, 700, (70, 70, 90), 160, int(ts))
@@ -423,21 +511,21 @@ class Episode:
                 cap_y = 960
             else:
                 im = self.BG(sh['bg']).copy()
-                pos = [(150, 1000, 434), (580, 1000, 434), (250, 960, 350), (480, 960, 350), (60, 1280, 665), (670, 1280, 665)]
+                pos = [(120, 1060, 560), (600, 1060, 560), (240, 1000, 440), (480, 1000, 440), (40, 1290, 800), (680, 1290, 800)]
                 for k in range(sh['enemies']):
                     x, fy, h = pos[k]
                     self.paste_feet(im, self.fig(None, 'stand' if k % 3 else 'bow', h, sil=True, mirror=x > 360, enemy=True), x, fy)
-                hero_h = 640 if sh['pose'] == 'raise' else 560
+                hero_h = 860 if sh['pose'] == 'raise' else 780
                 if sh.get('with'):
-                    self.paste_feet(im, self.fig(sh['with'], 'stand', 520, mirror=True), 500, 1170 + bob)
-                    self.paste_feet(im, self.fig(sh['hero'], sh['pose'], hero_h, prop=sh.get('prop', 'wheel')), 240, 1180 + bob)
+                    self.paste_feet(im, self.fig(sh['with'], 'stand', 720, mirror=True), 520, 1235 + bob)
+                    self.paste_feet(im, self.fig(sh['hero'], sh['pose'], hero_h, prop=sh.get('prop', 'wheel')), 220, 1245 + bob)
                 else:
-                    self.paste_feet(im, self.fig(sh['hero'], sh['pose'], hero_h, prop=sh.get('prop', 'wheel')), 360, 1180 + bob)
+                    self.paste_feet(im, self.fig(sh['hero'], sh['pose'], hero_h, prop=sh.get('prop', 'wheel')), 360, 1245 + bob)
                 if sh.get('arrows'):
                     self.draw_arrows(im, t, s0, s1)
                 for ft in self.flashes:
                     if 0 <= t - ft < 0.5:
-                        im.alpha_composite(Image.new('RGBA', (OW, OH), (255, 236, 200, int(220 * (1 - (t - ft) / 0.5)))))
+                        im.alpha_composite(Image.new('RGBA', (OW, OH), (255, 236, 200, int(140 * (1 - (t - ft) / 0.5)))))
                         shake = (rnd.randint(-10, 10), rnd.randint(-10, 10))
                 if sh['bg'].startswith('battle'):
                     self.embers(im, t, 3, 30)

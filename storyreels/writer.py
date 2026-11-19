@@ -82,7 +82,12 @@ Rendering vocabulary (use ONLY these values):
 - shot types:
   bust   -> {{"type":"bust","char":ID,"bg":BG,"mood":MOOD}}  close-up of one character; moods: {', '.join(MOODS)}
   wide   -> {{"type":"wide","bg":BG,"hero":ID,"pose":POSE,"with":ID or null,"enemies":0-6,"arrows":bool,"flash":bool,"silhouette":bool,"prop":"wheel"|"rock"}}  poses: {', '.join(POSES)} ("raise" lifts the prop overhead; silhouette=true is a dramatic sunset silhouette)
-  symbol -> {{"type":"symbol","kind":"spiral"|"fire"|"rays"|"lotus"|"storm","bg":BG}}  for formations, fire, divine light, storms
+  symbol -> {{"type":"symbol","kind":KIND,"bg":BG}}  full-screen mood shot. KIND by genre:
+            myth: spiral (ONLY for the Chakravyuh/army formation), rays (divine light), lotus, fire, storm
+            history: fort (forts, kingdoms, battles), fire, storm, rays
+            ghost: tree (haunted tree / jungle), moon (night, full moon), eyes (something watching), storm, fire
+Shot rules: use bust shots for most scenes (about 70%), always for dialogue (bust of the speaker).
+Use wide shots only for real action (fights, arrows, chases, lifting something) — at most 2 per part. At most 2 symbol shots per part.
 Genre rules:
 - myth: faithful to the traditional telling, respectful.
 - history: stick to recorded facts with real years and places; anything legendary must be framed as "कहा जाता है..." / "किंवदंती है..."; neutral tone, never communal or hateful toward any religion or community; no glorified gore.
