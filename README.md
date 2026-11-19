@@ -1,4 +1,4 @@
-# storyreels — auto Hindi mythology reels → Instagram every 30 min
+# storyreels — auto Hindi mythology reels → Instagram every hour
 
 Every run:
 1. Takes the next story from `storyreels/catalog.py`. When the list runs out, the LLM suggests a new one.
@@ -24,7 +24,7 @@ The 4K master (`*_4k.mp4`) is kept in the run's artifacts for YouTube Shorts and
 > If you use a Facebook Page–linked token instead, set `IG_API_HOST=graph.facebook.com`.
 
 ## Run on GitHub Actions (recommended: no server, no AWS)
-The workflow `.github/workflows/post-reel.yml` runs every 30 min:
+The workflow `.github/workflows/post-reel.yml` runs every hour:
 - Renders on the GitHub runner: a 4K master, plus a 1080p copy to post.
 - Hosts the 1080p reel on this repo's `media` branch. The Instagram API with Instagram Login fetches videos from a **public URL**,
   and `raw.githubusercontent.com` serves that URL. Only the latest reel is kept.
