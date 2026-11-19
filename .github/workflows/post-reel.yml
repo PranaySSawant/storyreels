@@ -1,0 +1,97 @@
+name: post-reel
+
+on:
+  schedule:
+    - cron: '7,37 * * * *'        # every 30 min (UTC), offset from :00/:30 to avoid GitHub's busiest minutes
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Write + render only, do not post'
+        type: boolean
+        default: true
+
+concurrency:
+  group: storyreels
+  cancel-in-progress: false
+
+permissions:
+  contents: write                  # push the 'state' and 'media' branches
+
+jobs:
+  reel:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DATA_DIR: ${{ github.workspace }}/data
+      PIPER_VOICES_DIR: ${{ github.workspace }}/voices
+      RENDER_SCALE: ${{ vars.RENDER_SCALE || '3' }}   # 3 = 4K master (2160x3840), 1 = 720p
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: System packages
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-noto-core
+
+      - name: Cache Hindi voices
+        uses: actions/cache@v4
+        with:
+          path: voices
+          key: piper-hi-voices-v1
+
+      - name: Install
+        run: |
+          pip install -q -r requirements.txt
+          bash scripts/get_voices.sh voices
+
+      - name: Load state (from 'state' branch)
+        run: |
+          mkdir -p data
+          if git ls-remote --exit-code --heads origin state >/dev/null; then
+            git fetch -q origin state
+            git archive origin/state | tar -x -C data
+          fi
+          ls -la data
+
+      - name: Write, render, post
+        env:
+          LLM_PROVIDER: ${{ vars.LLM_PROVIDER || 'anthropic' }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_MODEL: ${{ vars.ANTHROPIC_MODEL || 'claude-sonnet-5-5' }}
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_API_HOST: ${{ vars.IG_API_HOST || 'graph.instagram.com' }}
+          STATE_KEY: ${{ secrets.STATE_KEY }}
+          WEBHOOK_URL: ${{ secrets.WEBHOOK_URL }}      # Make/Zapier mode (then IG_* secrets are not needed)
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+            python -m storyreels.main run --dry-run
+          else
+            python -m storyreels.main run
+          fi
+
+      - name: Save state (to 'state' branch)
+        if: always()
+        run: |
+          cd data
+          [ -f state.json ] || exit 0
+          rm -rf .git && git init -q && git checkout -q -b state
+          git add state.json $( [ -f ig_token.json.enc ] && echo ig_token.json.enc )
+          git -c user.name=storyreels-bot -c user.email=bot@users.noreply.github.com commit -q -m "state $(date -u +%FT%TZ)"
+          git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" state
+
+      - name: Keep the reels as build artifacts (1080p post + 4K master)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reel-${{ github.run_number }}
+          path: |
+            data/out/*.mp4
+            data/pipeline.log
+          retention-days: 3
+          if-no-files-found: ignore

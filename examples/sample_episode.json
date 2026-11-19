@@ -1,0 +1,27 @@
+{
+  "story_id": "chakravyuh",
+  "story_title": "चक्रव्यूह",
+  "part": 1,
+  "total_parts": 3,
+  "main_character": "abhi",
+  "hook": "क्या आप जानते हैं, *अभिमन्यु* ने चक्रव्यूह तोड़ना माँ के *गर्भ* में ही सीख लिया था?",
+  "hook_bg": "battlefield",
+  "characters": {
+    "abhi":  {"name": "अभिमन्यु", "preset": "prince", "voice": "young_man"},
+    "yudhi": {"name": "युधिष्ठिर", "preset": "king", "voice": "man"},
+    "drona": {"name": "द्रोणाचार्य", "preset": "sage", "voice": "old_man", "angry": 0.45},
+    "subhadra": {"name": "सुभद्रा", "preset": "mother", "voice": "woman"}
+  },
+  "scenes": [
+    {"speaker": "narrator", "text": "महाभारत युद्ध का *तेरहवाँ* दिन। गुरु *द्रोण* ने रचा... *चक्रव्यूह*।", "shot": {"type": "symbol", "kind": "spiral", "bg": "battlefield_dark"}},
+    {"speaker": "drona", "text": "आज पांडवों में कोई इसे भेद नहीं पाएगा। *अर्जुन* तो दूर है।", "shot": {"type": "bust", "char": "drona", "bg": "palace_red", "mood": "sly"}},
+    {"speaker": "yudhi", "text": "अर्जुन के बिना... कौन तोड़ेगा यह *व्यूह*?", "shot": {"type": "bust", "char": "yudhi", "bg": "palace_blue", "mood": "sad"}},
+    {"speaker": "abhi", "text": "मैं, *ताऊश्री*। माँ के गर्भ में ही मैंने व्यूह में *प्रवेश* करना सुना था।", "shot": {"type": "bust", "char": "abhi", "bg": "palace_blue", "mood": "calm"}},
+    {"speaker": "narrator", "text": "पर *बाहर* निकलने का रास्ता... माता *सुभद्रा* सो गई थीं।", "shot": {"type": "bust", "char": "subhadra", "bg": "night", "mood": "sleep"}},
+    {"speaker": "narrator", "text": "अभिमन्यु ने व्यूह का *पहला द्वार* तोड़ दिया।", "shot": {"type": "wide", "bg": "battlefield", "hero": "abhi", "pose": "bow", "enemies": 4, "arrows": true, "flash": true}},
+    {"speaker": "abhi", "text": "आज *अर्जुन* का पुत्र दिखाएगा कि वह कौन है!", "shot": {"type": "bust", "char": "abhi", "bg": "battlefield_dark", "mood": "angry"}}
+  ],
+  "cliffhanger": {"text": "पर पीछे... द्वार फिर *बंद* हो रहा था।", "card": "द्वार का रहस्य"},
+  "caption": "चक्रव्यूह भाग 1 | अभिमन्यु ने माँ के गर्भ में क्या सीखा था?",
+  "hashtags": ["#mahabharat", "#abhimanyu", "#chakravyuh", "#hindimythology", "#krishna"]
+}
