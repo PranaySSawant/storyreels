@@ -2,7 +2,7 @@ name: make-reel
 
 on:
   schedule:
-    - cron: '17 * * * *'          # every hour at :17 (offset from :00 to avoid GitHub's busiest minute)
+    - cron: '7,22,37,52 * * * *'  # checks every 15 min; the gate below makes a reel only if the last one is ~1h old (GitHub drops some scheduled runs)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -28,26 +28,46 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Gate (one reel per hour)
+        id: gate
+        env:
+          INTERVAL_MIN: ${{ vars.INTERVAL_MIN || '60' }}
+        run: |
+          skip=false
+          if [ "${{ github.event_name }}" = "schedule" ] && git ls-remote --exit-code --heads origin state >/dev/null; then
+            git fetch -q origin state
+            last=$(git show origin/state:state.json 2>/dev/null | python3 -c "import sys,json;p=json.load(sys.stdin).get('posts',[]);print(p[-1]['t'] if p else 0)" || echo 0)
+            age=$(( ($(date +%s) - last) / 60 ))
+            echo "last reel ${age} min ago"
+            if [ "$age" -lt $(( INTERVAL_MIN - 8 )) ]; then skip=true; fi
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+
       - uses: actions/setup-python@v5
+        if: steps.gate.outputs.skip != 'true'
         with:
           python-version: '3.12'
           cache: pip
 
       - name: System packages
+        if: steps.gate.outputs.skip != 'true'
         run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-noto-core
 
       - name: Cache Hindi voices
+        if: steps.gate.outputs.skip != 'true'
         uses: actions/cache@v4
         with:
           path: voices
           key: piper-hi-voices-v1
 
       - name: Install
+        if: steps.gate.outputs.skip != 'true'
         run: |
           pip install -q -r requirements.txt
           bash scripts/get_voices.sh voices
 
       - name: Load state (from 'state' branch)
+        if: steps.gate.outputs.skip != 'true'
         run: |
           mkdir -p data
           if git ls-remote --exit-code --heads origin state >/dev/null; then
@@ -57,6 +77,7 @@ jobs:
           ls -la data
 
       - name: Write, render, post
+        if: steps.gate.outputs.skip != 'true'
         env:
           LLM_PROVIDER: ${{ vars.LLM_PROVIDER }}          # empty -> groq if GROQ_API_KEY is set, else anthropic
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -81,7 +102,7 @@ jobs:
           fi
 
       - name: Save state (to 'state' branch)
-        if: always()
+        if: always() && steps.gate.outputs.skip != 'true'
         run: |
           cd data
           [ -f state.json ] || exit 0
@@ -91,7 +112,7 @@ jobs:
           git push -q -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" state
 
       - name: Keep the reels as build artifacts (1080p post + 4K master)
-        if: always()
+        if: always() && steps.gate.outputs.skip != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: reel-${{ github.run_number }}
