@@ -34,13 +34,19 @@ jobs:
           from storyreels import main, writer, render, notify
           st = json.loads(subprocess.check_output(['git', 'show', 'origin/state:state.json']))
           st['next_source'] = 'wiki'
-          st['last_genre'] = 'history'          # -> ghost turn
+          st['last_genre'] = os.environ.get('TRIAL_AFTER', 'ghost')   # ghost -> next is a myth story
+          import asyncio, edge_tts
+          vs = asyncio.run(edge_tts.list_voices())
+          print('HINDI VOICES:', [v['ShortName'] for v in vs if v['Locale'].startswith('hi')])
           sid, title, brief, genre, wt = main.next_story(st)
           print('TRIAL STORY:', genre, sid, title, '|', wt, '|', brief)
           plan = writer.plan_series(title, brief, genre, sid, wt)
           print('PLAN:', plan['story_title'], plan['total_parts'], 'parts; source:', plan.get('reference_source'))
           ep = writer.write_episode(plan, 1, None, genre)
-          print(json.dumps({k: ep[k] for k in ('hook', 'scenes', 'cliffhanger')}, ensure_ascii=False, indent=1))
+          print('LOOKS:', json.dumps({k: v.get('look') for k, v in plan['characters'].items()}, ensure_ascii=False))
+          print('HOOK:', ep['hook'])
+          for s in ep['scenes']:
+              print('LINE:', s['speaker'], '|', s['text'], '|', s.get('visual'))
           mp4, cover, dur = render.render_episode(ep, 'trial/work', 'trial/TEST_' + sid + '.mp4')
           print('rendered', round(dur, 1), 's')
           ep['story_title'] = 'TEST — ' + ep['story_title']

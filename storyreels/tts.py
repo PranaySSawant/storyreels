@@ -12,20 +12,20 @@ ENGINE = os.environ.get('TTS_ENGINE', 'edge')
 
 # style: (edge voice, edge rate, edge pitch, piper model, piper semitones, piper speed, extra ffmpeg filter)
 VOICE_STYLES = {
-    'narrator':    ('hi-IN-MadhurNeural', '-6%', '-4Hz', 'rohan', 0.0, 0.92, ''),
-    'man':         ('hi-IN-MadhurNeural', '+0%', '-8Hz', 'pratham', -1.0, 0.97, ''),
-    'young_man':   ('hi-IN-MadhurNeural', '+6%', '+10Hz', 'pratham', 2.0, 1.05, ''),
-    'old_man':     ('hi-IN-MadhurNeural', '-12%', '-22Hz', 'rohan', -3.0, 0.90, ',aecho=0.8:0.5:40:0.10'),
-    'villain':     ('hi-IN-MadhurNeural', '-8%', '-30Hz', 'rohan', -5.0, 0.92, ',aecho=0.8:0.6:60:0.25'),
-    'divine':      ('hi-IN-MadhurNeural', '-12%', '-14Hz', 'rohan', -2.0, 0.88, ',aecho=0.8:0.7:90:0.22'),
+    # small, natural adjustments only — big pitch shifts on neural voices are what makes them sound robotic
+    'narrator':    ('hi-IN-MadhurNeural', '-4%', '+0Hz', 'rohan', 0.0, 0.92, ''),
+    'man':         ('hi-IN-MadhurNeural', '+2%', '-4Hz', 'pratham', -1.0, 0.97, ''),
+    'young_man':   ('hi-IN-MadhurNeural', '+5%', '+6Hz', 'pratham', 2.0, 1.05, ''),
+    'old_man':     ('hi-IN-MadhurNeural', '-10%', '-10Hz', 'rohan', -3.0, 0.90, ''),
+    'villain':     ('hi-IN-MadhurNeural', '-8%', '-12Hz', 'rohan', -5.0, 0.92, ''),
+    'divine':      ('hi-IN-MadhurNeural', '-10%', '-6Hz', 'rohan', -2.0, 0.88, ',aecho=0.9:0.4:60:0.12'),
     'woman':       ('hi-IN-SwaraNeural', '+0%', '+0Hz', 'priyamvada', 0.0, 0.97, ''),
-    'young_woman': ('hi-IN-SwaraNeural', '+5%', '+12Hz', 'priyamvada', 1.5, 1.02, ''),
-    'old_woman':   ('hi-IN-SwaraNeural', '-10%', '-14Hz', 'priyamvada', -2.0, 0.92, ''),
-    'child':       ('hi-IN-SwaraNeural', '+8%', '+45Hz', 'pratham', 4.0, 1.08, ''),
+    'young_woman': ('hi-IN-SwaraNeural', '+4%', '+6Hz', 'priyamvada', 1.5, 1.02, ''),
+    'old_woman':   ('hi-IN-SwaraNeural', '-8%', '-8Hz', 'priyamvada', -2.0, 0.92, ''),
+    'child':       ('hi-IN-SwaraNeural', '+6%', '+18Hz', 'pratham', 4.0, 1.08, ''),
 }
-# light "recorded voice" finish: warmth, gentle compression, tiny room
-FINISH = 'highpass=f=70,equalizer=f=180:t=q:w=1:g=2,equalizer=f=6500:t=q:w=2:g=-2,acompressor=threshold=-18dB:ratio=3:attack=10:release=150,' \
-         'aecho=0.85:0.25:18|31:0.08|0.05,loudnorm=I=-16:TP=-1.5'
+# clean, broadcast-style finish (no artificial room/echo): gentle warmth + light compression
+FINISH = 'highpass=f=60,equalizer=f=160:t=q:w=1:g=1.5,acompressor=threshold=-20dB:ratio=2:attack=15:release=200,loudnorm=I=-16:TP=-1.5'
 
 
 def _speakable(text):

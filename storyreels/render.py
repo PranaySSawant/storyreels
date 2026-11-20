@@ -2,7 +2,7 @@
 import os, math, random, subprocess, json, multiprocessing as mp
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
-from . import art, tts, audio
+from . import art, tts, audio, images
 from .art import W, H, K, OW, OH, GOLD, GOLD_L, WHITE
 
 FPS = 30
@@ -208,6 +208,26 @@ class Episode:
         self._bust, self._fig, self._cap = {}, {}, {}
         self._ghost = {}
         self._fog = None
+        self._illus = {}
+        g = np.zeros((OH, 1), np.float32)
+        y = np.arange(OH) / OH
+        g[:, 0] = np.clip((y - 0.55) / 0.35, 0, 1) ** 1.3 * 215
+        grad = Image.new('RGBA', (OW, OH), (0, 0, 0, 255))
+        grad.putalpha(Image.fromarray(np.repeat(g, OW, 1).astype(np.uint8)))
+        self.grad = grad
+        top = np.zeros((OH, 1), np.float32); top[:, 0] = np.clip((0.32 - y) / 0.32, 0, 1) * 200
+        self.topgrad = Image.new('RGBA', (OW, OH), (0, 0, 0, 255)); self.topgrad.putalpha(Image.fromarray(np.repeat(top, OW, 1).astype(np.uint8)))
+
+    def illus(self, i):
+        if i not in self._illus:
+            for k in [k for k in self._illus if abs(k - i) > 1]:
+                del self._illus[k]
+            im = Image.open(self.images[i]).convert('RGB')
+            sc = max(OW / im.width, OH / im.height)
+            im = im.resize((int(im.width * sc + 0.5), int(im.height * sc + 0.5)), Image.LANCZOS)
+            x0 = (im.width - OW) // 2; y0 = (im.height - OH) // 2
+            self._illus[i] = im.crop((x0, y0, x0 + OW, y0 + OH)).convert('RGBA')
+        return self._illus[i].copy()
 
     def ghostify(self, img, t):
         lvl = [0.55, 0.7, 0.85][int(t * 7) % 3 if random.Random(int(t * 7)).random() < 0.35 else 1]
@@ -466,7 +486,24 @@ class Episode:
         shake = (0, 0)
         rnd = random.Random(int(t * 1000))
         cap_y = 960
-        if typ == 'hook':
+        pan = 0.0
+        illus = typ != 'end' and i in getattr(self, 'images', {})
+        if illus:
+            im = self.illus(i)
+            if self.genre == 'ghost':
+                self.fog(im, t)
+            elif sh.get('bg', '').startswith('battle') or sh.get('kind') == 'fire':
+                self.embers(im, t, 3, 25)
+            if typ == 'hook':
+                im.alpha_composite(self.topgrad)
+                im.alpha_composite(Image.new('RGBA', (OW, OH), (0, 0, 0, 60)))
+            im.alpha_composite(self.grad)
+            pan = (1 if i % 2 else -1) * 22 * (ts / max(dur, 0.1) - 0.5)
+            cap_y = 1010
+            for ft in self.flashes:
+                if 0 <= t - ft < 0.4 and self.genre != 'ghost':
+                    im.alpha_composite(Image.new('RGBA', (OW, OH), (255, 236, 200, int(110 * (1 - (t - ft) / 0.4)))))
+        elif typ == 'hook':
             im = self.BG(sh.get('bg', 'battlefield')).copy()
             if sh.get('char') in self.chars:
                 b = self.bust(sh['char'], 0, False, None)
@@ -541,12 +578,16 @@ class Episode:
             ec = self.end_card(sh.get('card', '')).copy()
             ec.putalpha(ec.getchannel('A').point(lambda v: int(v * a)))
             im.alpha_composite(ec); self.embers(im, t, 9, 40)
-        z = 1.0 + 0.07 * min(1, ts / max(dur, 0.1))
+        prog = min(1, ts / max(dur, 0.1))
+        if illus:   # Ken Burns: alternate slow zoom-in / zoom-out with a gentle pan
+            z = 1.04 + 0.08 * (prog if i % 2 == 0 else 1 - prog)
+        else:
+            z = 1.0 + 0.07 * prog
         cw, ch = W / z, H / z
-        cx, cy = W / 2 + shake[0], H / 2 - 400 * (z - 1) + shake[1]
+        cx, cy = W / 2 + shake[0] + pan, H / 2 - (0 if illus else 400 * (z - 1)) + shake[1]
         im = im.transform((OW, OH), Image.EXTENT, ((cx - cw / 2) * K, (cy - ch / 2) * K, (cx + cw / 2) * K, (cy + ch / 2) * K), Image.BILINEAR)
         im.alpha_composite(self.vig)
-        if typ in ('bust', 'wide', 'symbol') and t >= self.starts[i] - 0.1:
+        if (typ in ('bust', 'wide', 'symbol')) and t >= self.starts[i] - 0.1:
             n = sum(1 for x in self.word_times(i) if x <= t)
             if n:
                 comp(im, self.caption(i, n, cap_y))
@@ -580,6 +621,7 @@ def render_episode(ep, workdir, out_mp4, log=print):
     global _EP
     e = Episode(ep, workdir)
     log('tts...'); e.voices()
+    e.images = images.scene_images(ep, workdir, log=log) if os.environ.get('IMAGES', 'on') != 'off' else {}
     log(f'duration {e.total:.1f}s; mixing audio...'); e.mix(f'{workdir}/mix.wav')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', f'{workdir}/mix.wav', '-af', 'loudnorm=I=-14:TP=-1', '-ar', '44100', f'{workdir}/mix_n.wav'], check=True)
     e.assets()

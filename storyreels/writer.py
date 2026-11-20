@@ -5,7 +5,7 @@ from .tts import VOICE_STYLES
 from . import sources
 
 PROVIDER = (os.environ.get('LLM_PROVIDER') or ('groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
-GROQ_PREFERRED = ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
+GROQ_PREFERRED = ['moonshotai/kimi-k2-instruct', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
 _groq_model = None
 
 
@@ -18,7 +18,7 @@ def groq_model():
     try:
         r = requests.get('https://api.groq.com/openai/v1/models', timeout=30, headers={'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}"})
         ids = [m['id'] for m in r.json().get('data', [])]
-        _groq_model = next((m for m in GROQ_PREFERRED if m in ids), ids[0] if ids else GROQ_PREFERRED[0])
+        _groq_model = next((i for m in GROQ_PREFERRED for i in sorted(ids, reverse=True) if i == m or i.startswith(m + '-')), ids[0] if ids else GROQ_PREFERRED[0])
     except Exception:
         _groq_model = GROQ_PREFERRED[0]
     print('groq model:', _groq_model)
@@ -120,6 +120,8 @@ Storytelling craft (this is what makes people watch to the end and follow):
 - Part 2+ starts with a one-line recap scene: "पिछले भाग में..." (max 14 words), then straight into action.
 - Cliffhanger: stop at the moment of highest tension and leave an open question; the final part ends with a payoff and a one-line meaning/moral.
 - Stay faithful to the reference text when one is given; never invent major events, names or numbers.
+- NEVER invent named characters (no made-up names like Rahul/Salim). Only people named in the reference/brief; unnamed roles are allowed only as roles ("एक बूढ़ा पुजारी", "गाँव की औरत").
+- Every line must make sense on its own and follow from the previous one; no filler, no vague mood lines without content. Re-read for logic before answering.
 Text rules: every spoken line is Hindi Devanagari, max 18 words, punchy, dramatic, simple words. Wrap 1-2 key words per line in *asterisks* (they render gold). Use "..." for dramatic pauses."""
 
 
@@ -150,7 +152,8 @@ Split it into 2-5 parts (each part ~45-70 seconds of narration+dialogue), each e
 Return JSON:
 {{"story_title": "short Hindi title (max 3 words)",
   "total_parts": N,
-  "characters": {{"id": {{"name": "Hindi name", "preset": PRESET, "voice": VOICE, ...optional overrides}}}},
+  "characters": {{"id": {{"name": "Hindi name", "name_en": "English name", "preset": PRESET, "voice": VOICE,
+                          "look": "fixed English visual description used for every illustration: age, build, skin tone, face, hair/beard, clothes and colours, ornaments/weapons (25-40 words)", ...optional overrides}}}},
   "main_character": "id",
   "parts": [{{"summary": "English summary of what happens in this part",
              "beats": ["4-6 concrete story beats in order, English"],
@@ -202,7 +205,9 @@ Characters (use these ids only): {json.dumps(chars, ensure_ascii=False)}
 Write this part. Return JSON:
 {{"hook": "opening narrator QUESTION in Hindi that makes viewers curious, e.g. 'क्या आप जानते हैं...?' / 'क्या होता अगर...?' / 'किसने...?' — must end with ?",
   "hook_bg": BG,
-  "scenes": [{{"speaker": "narrator" or character id, "text": "...", "shot": SHOT}}],   // 7-10 scenes, mix narrator and dialogue, vary shots; the speaking character should usually be in a bust shot of themselves; use 1-3 wide/symbol shots for action
+  "hook_visual": "English description of a striking opening illustration for the hook (who/what, where, mood, camera angle)",
+  "scenes": [{{"speaker": "narrator" or character id, "text": "...", "shot": SHOT,
+              "visual": "English description of the illustration for THIS line: exactly what the line says/shows — which characters (use their English names), what they are doing, facial expression, place, time of day, camera angle (close-up for dialogue, wide for action/places). 20-40 words."}}],   // 7-10 scenes, mix narrator and dialogue, vary shots; the speaking character should usually be in a bust shot of themselves; use 1-3 wide/symbol shots for action
   "cliffhanger": {{"text": "narrator line that {'closes the story with its moral/meaning' if last else 'teases what happens next without resolving it'}", "card": "{'2-4 word Hindi closing title' if last else '2-4 word Hindi title teasing next part'}"}},
   "caption": "Instagram caption in Hindi (1-2 lines) that repeats the hook question and says भाग {part_no}/{plan['total_parts']}",
   "hashtags": ["#..." 8-12 relevant tags, Hindi+English mix],
@@ -221,6 +226,7 @@ def polish(draft, validate, genre, reference=''):
     user = f"""You are the story editor. Improve this {genre} reel script JSON without changing its structure:
 - make the hook a sharper curiosity question; make lines shorter, more emotional and visual; turn dry narration into dialogue where natural
 - keep every scene's speaker ids, keep shot objects valid, keep 6-12 scenes, keep *gold* marks on 1-2 key words per line
+- keep a 'visual' for every scene and make it match its line exactly (who, doing what, where); remove invented named characters; fix any line that doesn't make sense
 - fix any fact that contradicts the reference; keep the cliffhanger at peak tension
 {('Reference:' + chr(10) + reference[:2000]) if reference else ''}
 Draft:
