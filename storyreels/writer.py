@@ -26,6 +26,23 @@ def groq_model():
 
 
 def llm(system, user, max_tokens=4000):
+    """Calls the LLM; waits and retries on rate limits (Groq free tier: ~8k tokens/min)."""
+    for attempt in range(8):
+        try:
+            return _llm(system, user, max_tokens)
+        except RuntimeError as e:
+            msg = str(e)
+            if ' 429' not in msg and ' 503' not in msg and ' 500' not in msg:
+                raise
+            m = re.search(r'try again in ([0-9.]+)(ms|s|m)', msg)
+            wait = float(m.group(1)) * {'ms': 0.001, 's': 1, 'm': 60}[m.group(2)] if m else 20
+            wait = min(max(wait + 2, 5), 120) * (1 + attempt * 0.5)
+            print(f'LLM rate-limited, waiting {wait:.0f}s (attempt {attempt + 1})')
+            time.sleep(wait)
+    return _llm(system, user, max_tokens)
+
+
+def _llm(system, user, max_tokens=4000):
     if PROVIDER == 'groq':
         r = requests.post('https://api.groq.com/openai/v1/chat/completions', timeout=120,
                           headers={'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}"},
