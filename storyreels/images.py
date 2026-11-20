@@ -1,4 +1,5 @@
-"""Illustrated scene images for each line of the story.
+"""(OFF by default — free image models produced unsafe/inconsistent results. Enable only with a safe paid model: IMAGES=on)
+Illustrated scene images for each line of the story.
 
 Uses Pollinations (free FLUX image generation, no key). Each scene image is a 9:16 painting built from:
   genre style + fixed character looks (so characters stay recognisable) + the scene's visual description.
@@ -33,7 +34,7 @@ def build_prompt(genre, visual, looks):
 
 def generate(prompt, out_path, seed, w=1080, h=1920, tries=4):
     global _disabled
-    if _disabled or os.environ.get('IMAGES', 'on') == 'off':
+    if _disabled or os.environ.get('IMAGES', 'off') != 'on':
         return None
     if os.path.exists(out_path):
         return out_path

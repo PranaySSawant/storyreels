@@ -1,5 +1,5 @@
 """Render an episode JSON into a 9:16 MP4 with voices, captions, music."""
-import os, math, random, subprocess, json, multiprocessing as mp
+import os, re, math, random, subprocess, json, multiprocessing as mp
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 from . import art, tts, audio, images
@@ -92,24 +92,97 @@ class Episode:
                'ghost': ('tree', 'moon', 'eyes', 'storm', 'fire')}
     DEFAULT_SYMBOL = {'myth': 'rays', 'history': 'fort', 'ghost': 'tree'}
 
+    # ------------------------------------------------------------ director: the picture follows the words
+    KW_SYMBOL = [  # (regex on the line, genre or None, symbol kind)
+        (r'चक्रव्यूह|व्यूह', 'myth', 'spiral'),
+        (r'चाँद|चांद|पूर्णिमा|अमावस', None, 'moon'),
+        (r'आँखें|आंखें|घूर|कोई देख रहा|निगाह', 'ghost', 'eyes'),
+        (r'पेड़|पीपल|बरगद|पेड़ों', 'ghost', 'tree'),
+        (r'आग|अग्नि|ज्वाला|लपट|जल उठ|भस्म|चिता', None, 'fire'),
+        (r'तूफ़ान|तूफान|आँधी|बिजली|बादल|बारिश|वर्षा|प्रलय|बाढ़', None, 'storm'),
+        (r'किला|किले|दुर्ग|गढ़|क़िला|सिंहगढ़|राजधानी|साम्राज्य', 'history', 'fort'),
+        (r'दिव्य|प्रकट|वरदान|आशीर्वाद|प्रकाश|तेज|स्वर्ग|देवता', 'myth', 'rays'),
+        (r'कमल|लक्ष्मी', 'myth', 'lotus'),
+    ]
+    KW_BATTLE = r'युद्ध|लड़ाई|सेना|सैनिक|तीर|बाण|हमला|तलवार|धनुष|महारथी|घेर|आक्रमण|रणभूमि|तोड़ दिया|प्रहार|भिड़'
+    KW_PLACE = r'वाड़ा|वाड़े|महल|हवेली|खंडहर|किला|किले|गाँव|गांव|मंदिर|घाट|कुआँ|बावली|सभा|दरबार|जंगल|वन '
+    KW_MOOD = [(r'डर|भय|काँप|चीख|सिहर|डरावन|भूत|बचाओ|वाचवा', 'scared'),
+               (r'क्रोध|ग़ुस्सा|गुस्सा|ललकार|चेतावनी|नहीं छोड़ूँगा|मार डालूँगा', 'angry'),
+               (r'रो |रोते|आँसू|दुख|शोक|मृत्यु|मर गया|बलिदान', 'sad'),
+               (r'हँस|मुस्कुरा|खुश|प्रसन्न|आनंद', 'smile'),
+               (r'चौंक|हैरान|अचानक|क्या\?|असंभव', 'shock')]
+
+    def _mood(self, text, fallback=None):
+        for rx, m in self.KW_MOOD:
+            if re.search(rx, text):
+                return m
+        if text.rstrip().endswith('!'):
+            return 'scared' if self.genre == 'ghost' else 'angry'
+        return fallback if fallback in art.MOODS else ('scared' if self.genre == 'ghost' else 'calm')
+
+    def _mentioned(self, text):
+        for cid, c in self.chars.items():
+            n = (c.get('name') or '').split()
+            if n and any(len(w) > 1 and w in text for w in n):
+                return cid
+        return None
+
     def clean_shots(self):
-        """Keep the reel on-theme: genre-appropriate symbols, at most 2 wide shots, wide only for real action."""
+        """Pick each picture from what the line actually says:
+        dialogue -> close-up of the speaker; narration about someone -> that person; places/things -> matching scene;
+        battle words -> action shot. Backgrounds stay consistent per character."""
         g = self.genre
-        wides = 0
+        home = {}
+        for l in self.lines:     # the background each character is mostly seen in, from the script
+            sh = l['shot']
+            if sh['type'] == 'bust' and sh.get('char') in self.chars:
+                home.setdefault(sh['char'], []).append(sh['bg'])
+        home = {c: max(set(v), key=v.count) for c, v in home.items()}
+        default_bg = {'ghost': 'night', 'history': 'battlefield', 'myth': 'palace_red'}[g]
+        main = self.ep.get('main_character') if self.ep.get('main_character') in self.chars else next(iter(self.chars))
+        wides, symbols, last_char = 0, 0, main
         for i, l in enumerate(self.lines):
             sh = l['shot']
-            if sh['type'] == 'symbol' and sh['kind'] not in self.SYMBOLS[g]:
-                sh['kind'] = self.DEFAULT_SYMBOL[g]
-            if sh['type'] == 'wide':
-                action = sh.get('enemies') or sh.get('arrows') or sh.get('silhouette') or sh.get('with') or sh.get('pose') not in ('stand', None)
+            if sh['type'] in ('hook', 'end'):
+                continue
+            text = l['text'].replace('*', '')
+            sp = l['speaker']
+            if sp in self.chars:                                   # dialogue: always the speaker
+                bg = home.get(sp) or sh.get('bg') or default_bg
+                l['shot'] = dict(type='bust', char=sp, bg=bg, mood=self._mood(text, sh.get('mood')))
+                last_char = sp
+                continue
+            who = self._mentioned(text)
+            battle = re.search(self.KW_BATTLE, text)
+            kind = next((k for rx, gg, k in self.KW_SYMBOL if (gg in (None, g)) and re.search(rx, text)), None)
+            place = re.search(self.KW_PLACE, text)
+            if kind == 'spiral' and symbols < 3 and (not who or re.search(r'रच', text)):
+                l['shot'] = dict(type='symbol', kind='spiral', bg=default_bg); symbols += 1
+            elif battle and wides < 2 and g != 'ghost':
+                hero = who or last_char
+                enemies = 4 if re.search(r'घेर|महारथी|सेना|सैनिक', text) else 2
+                pose = 'raise' if re.search(r'पहिया|उठा', text) else ('bow' if re.search(r'तीर|बाण|धनुष', text) else 'sword')
+                l['shot'] = dict(type='wide', bg='battlefield', hero=hero, pose=pose, enemies=enemies,
+                                 arrows=bool(re.search(r'तीर|बाण', text)), flash=bool(re.search(r'टूट|तोड़|विस्फोट|प्रहार', text)), with_=None)
+                l['shot']['with'] = None
                 wides += 1
-                if not action or wides > 2:
-                    sp = l['speaker']
-                    cid = sp if sp in self.chars else sh['hero']
-                    mood = 'scared' if g == 'ghost' else ('angry' if sh.get('enemies') else 'calm')
-                    l['shot'] = sh = dict(type='bust', char=cid, bg=sh['bg'], mood=mood)
-                elif g == 'ghost':
-                    sh['flash'] = False; sh['arrows'] = False
+            elif kind and kind != 'spiral' and symbols < 3 and not (who and kind in ('rays', 'lotus')):
+                l['shot'] = dict(type='symbol', kind=kind, bg=default_bg)
+                symbols += 1
+            elif place and not who and symbols < 3:                  # a place: show the place itself
+                pbg = {'ghost': 'fort_ruins' if re.search(r'वाड़ा|वाड़े|महल|हवेली|खंडहर|किला|किले', text) else
+                       ('forest' if re.search(r'जंगल|वन ', text) else 'village_night'),
+                       'history': 'fort_ruins' if re.search(r'खंडहर', text) else 'palace_red',
+                       'myth': 'forest' if re.search(r'जंगल|वन ', text) else ('temple' if 'मंदिर' in text else 'palace_red')}[g]
+                l['shot'] = dict(type='symbol', kind='place', bg=pbg)
+                symbols += 1
+            else:                                                  # narration about a person (or the hero)
+                cid = who or last_char
+                bg = home.get(cid) or sh.get('bg') or default_bg
+                l['shot'] = dict(type='bust', char=cid, bg=bg, mood=self._mood(text, sh.get('mood')))
+                last_char = cid
+            if l['shot']['type'] == 'symbol' and l['shot']['kind'] not in self.SYMBOLS[g] + ('place',):
+                l['shot']['kind'] = self.DEFAULT_SYMBOL[g]
 
     def fix_shot(self, sh, scene):
         sh = dict(sh)
@@ -131,7 +204,7 @@ class Episode:
             if sh.get('pose') not in art.POSES:
                 sh['pose'] = 'stand'
             sh['enemies'] = max(0, min(6, int(sh.get('enemies', 0) or 0)))
-        if t == 'symbol' and sh.get('kind') not in ('spiral', 'fire', 'rays', 'lotus', 'storm', 'tree', 'moon', 'eyes', 'fort'):
+        if t == 'symbol' and sh.get('kind') not in ('spiral', 'fire', 'rays', 'lotus', 'storm', 'tree', 'moon', 'eyes', 'fort', 'place'):
             sh['kind'] = 'rays'
         return sh
 
@@ -411,6 +484,12 @@ class Episode:
             im.alpha_composite(lay.filter(ImageFilter.GaussianBlur(3 * K)))
             art.glow(im, 360, 1100, 300, (255, 120, 30), 120)
             self.embers(im, ts, 11, 60)
+        elif kind == 'place':  # the location itself, no character
+            im = self.BG(bgk).copy()
+            if self.genre == 'ghost' or bgk in ('fort_ruins', 'haunted', 'village_night'):
+                self.fog(im, ts)
+            else:
+                self.embers(im, ts, 21, 20)
         elif kind == 'tree':   # haunted banyan in moonlight
             im = self.night_sky(); d = art.SD(im)
             art.glow(im, 470, 330, 160, (220, 230, 255), 130); d = art.SD(im)
@@ -621,7 +700,7 @@ def render_episode(ep, workdir, out_mp4, log=print):
     global _EP
     e = Episode(ep, workdir)
     log('tts...'); e.voices()
-    e.images = images.scene_images(ep, workdir, log=log) if os.environ.get('IMAGES', 'on') != 'off' else {}
+    e.images = images.scene_images(ep, workdir, log=log) if os.environ.get('IMAGES', 'off') == 'on' else {}
     log(f'duration {e.total:.1f}s; mixing audio...'); e.mix(f'{workdir}/mix.wav')
     subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', f'{workdir}/mix.wav', '-af', 'loudnorm=I=-14:TP=-1', '-ar', '44100', f'{workdir}/mix_n.wav'], check=True)
     e.assets()

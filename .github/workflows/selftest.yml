@@ -1,15 +1,67 @@
 name: selftest
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      source:
+        description: 'catalog or wiki'
+        default: 'catalog'
+      after_genre:
+        description: 'genre before the trial one (ghost -> myth, myth -> history, history -> ghost)'
+        default: 'ghost'
 permissions:
   contents: write
 jobs:
-  hide-test-releases:
+  trial:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      DATA_DIR: ${{ github.workspace }}/trial
+      PIPER_VOICES_DIR: ${{ github.workspace }}/voices
+      RENDER_SCALE: '3'
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GITHUB_TOKEN: ${{ github.token }}
+      GH_TOKEN: ${{ github.token }}
     steps:
-      - name: Turn TEST releases into private drafts
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12', cache: pip}
+      - timeout-minutes: 12
         run: |
-          for id in $(gh api repos/${{ github.repository }}/releases --paginate --jq '.[] | select(.tag_name | startswith("test-")) | .id'); do
-            gh api -X PATCH repos/${{ github.repository }}/releases/$id -F draft=true --jq '.tag_name + " draft=" + (.draft|tostring)'
+          for i in 1 2 3; do
+            sudo timeout 240 apt-get update -qq -o Acquire::Retries=3 && sudo timeout 240 apt-get install -y -qq --no-install-recommends ffmpeg fonts-noto-core && break
+            sleep 10
           done
+      - uses: actions/cache@v4
+        with: {path: voices, key: piper-hi-voices-v1}
+      - run: pip install -q -r requirements.txt && bash scripts/get_voices.sh voices && mkdir -p trial
+      - name: Trial reel — does not touch live state; result is a PRIVATE draft release
+        run: |
+          git fetch -q origin state
+          python - <<'PY'
+          import json, subprocess, os
+          from storyreels import main, writer, render, notify
+          st = json.loads(subprocess.check_output(['git', 'show', 'origin/state:state.json']))
+          st['next_source'] = '${{ inputs.source }}'
+          st['last_genre'] = '${{ inputs.after_genre }}'
+          sid, title, brief, genre, wt = main.next_story(st)
+          print('TRIAL STORY:', genre, sid, title, '|', wt, '|', brief)
+          plan = writer.plan_series(title, brief, genre, sid, wt)
+          print('PLAN:', plan['story_title'], plan['total_parts'], 'parts; source:', plan.get('reference_source'))
+          ep = writer.write_episode(plan, 1, None, genre)
+          ep['story_id'] = sid
+          print('HOOK:', ep['hook'])
+          e = render.Episode(ep, 'trial/x')
+          for l in e.lines:
+              sh = l['shot']
+              print('LINE:', l['speaker'], '|', sh['type'], sh.get('char') or sh.get('kind') or sh.get('hero') or '', sh.get('mood', ''), '|', l['text'])
+          mp4, cover, dur = render.render_episode(ep, 'trial/work', 'trial/TEST_' + sid + '.mp4')
+          print('rendered', round(dur, 1), 's')
+          json.dump(ep, open('trial/episode.json', 'w'), ensure_ascii=False, indent=1)
+          PY
+      - name: Save as PRIVATE draft release (only visible to you)
+        run: |
+          f=$(ls trial/TEST_*.mp4 | grep -v _4k | head -1); tag="test-$(date +%s)"
+          gh release create "$tag" --draft --title "TEST (private draft)" --notes "trial render" "$f" trial/episode.json
+          echo "DRAFT: $tag"

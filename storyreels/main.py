@@ -1,5 +1,5 @@
 """One pipeline cycle: pick story -> plan parts -> write next part -> render -> post. Run every 30 min from cron."""
-import os, sys, json, time, fcntl, shutil, argparse, traceback, logging
+import os, re, sys, json, time, fcntl, shutil, argparse, traceback, logging
 from . import catalog, writer, render, publish, notify
 
 DATA = os.environ.get('DATA_DIR', 'data')
@@ -86,7 +86,8 @@ def next_story(st):
         ep_en = (v.get('episode_en') or '').strip()
         if ep_en and ep_en.lower() != wt.lower():
             hit = sources.search_title(ep_en)
-            if hit:
+            words = set(re.findall(r'[a-z]{4,}', ep_en.lower()))
+            if hit and words & set(re.findall(r'[a-z]{4,}', hit.lower())):   # only if it is really that episode
                 wt = hit
         return sid, v.get('title') or wt, v.get('brief') or f'The story of "{wt}"', g, wt
     st['next_source'] = 'wiki'

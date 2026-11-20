@@ -4,7 +4,29 @@ from .art import PRESETS, BACKGROUNDS, POSES, MOODS
 from .tts import VOICE_STYLES
 from . import sources
 
-PROVIDER = (os.environ.get('LLM_PROVIDER') or ('groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
+PROVIDER = (os.environ.get('LLM_PROVIDER') or ('gemini' if os.environ.get('GEMINI_API_KEY') else 'groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
+GEMINI_BASE = 'https://generativelanguage.googleapis.com/v1beta/openai'
+_gemini_model = None
+
+
+def gemini_model():
+    global _gemini_model
+    if _gemini_model:
+        return _gemini_model
+    if os.environ.get('GEMINI_MODEL'):
+        _gemini_model = os.environ['GEMINI_MODEL']; return _gemini_model
+    try:
+        r = requests.get(f'{GEMINI_BASE}/models', timeout=30, headers={'Authorization': f"Bearer {os.environ['GEMINI_API_KEY']}"})
+        ids = [m['id'].split('/')[-1] for m in r.json().get('data', [])]
+        ok = [i for i in ids if i.startswith('gemini') and not re.search(r'image|tts|embed|audio|live|vision|lite|exp|preview', i)]
+        def ver(i):
+            m = re.search(r'gemini-(\d+(?:\.\d+)?)', i)
+            return (float(m.group(1)) if m else 0, 'pro' in i)
+        _gemini_model = sorted(ok, key=ver)[-1] if ok else 'gemini-2.5-flash'
+    except Exception:
+        _gemini_model = 'gemini-2.5-flash'
+    print('gemini model:', _gemini_model)
+    return _gemini_model
 GROQ_PREFERRED = ['openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
 _groq_model = None
 
@@ -43,6 +65,15 @@ def llm(system, user, max_tokens=4000):
 
 
 def _llm(system, user, max_tokens=4000):
+    if PROVIDER == 'gemini':
+        r = requests.post(f'{GEMINI_BASE}/chat/completions', timeout=180,
+                          headers={'Authorization': f"Bearer {os.environ['GEMINI_API_KEY']}"},
+                          json={'model': gemini_model(), 'max_tokens': max(max_tokens, 8000), 'temperature': 0.85,
+                                'response_format': {'type': 'json_object'},
+                                'messages': [{'role': 'system', 'content': system}, {'role': 'user', 'content': user}]})
+        if r.status_code >= 400:
+            raise RuntimeError(f'Gemini API {r.status_code}: {r.text[:500]}')
+        return r.json()['choices'][0]['message']['content']
     if PROVIDER == 'groq':
         r = requests.post('https://api.groq.com/openai/v1/chat/completions', timeout=120,
                           headers={'Authorization': f"Bearer {os.environ['GROQ_API_KEY']}"},
@@ -121,6 +152,7 @@ Storytelling craft (this is what makes people watch to the end and follow):
 - Part 2+ starts with a one-line recap scene: "पिछले भाग में..." (max 14 words), then straight into action.
 - Cliffhanger: stop at the moment of highest tension and leave an open question; the final part ends with a payoff and a one-line meaning/moral.
 - Stay faithful to the reference text when one is given; never invent major events, names or numbers.
+- A line spoken by a character ("मैं...", "तुम...") MUST have that character's id as speaker, never "narrator".
 - NEVER invent named characters (no made-up names like Rahul/Salim). Only people named in the reference/brief; unnamed roles are allowed only as roles ("एक बूढ़ा पुजारी", "गाँव की औरत").
 - Every line must make sense on its own and follow from the previous one; no filler, no vague mood lines without content. Re-read for logic before answering.
 Text rules: every spoken line is Hindi Devanagari, max 18 words, punchy, dramatic, simple words. Wrap 1-2 key words per line in *asterisks* (they render gold). Use "..." for dramatic pauses."""
@@ -135,8 +167,6 @@ def validate_plan(p):
         assert c.get('preset') in PRESETS, f'bad preset {c.get("preset")}'
         assert c.get('voice') in VOICE_STYLES and c['voice'] != 'narrator', f'bad voice for {cid}'
         assert c.get('name'), f'name missing for {cid}'
-        assert c.get('look') and not re.search('[\u0900-\u097F]', c['look']), f'look for {cid} must be in ENGLISH'
-        assert c.get('gender') in ('m', 'f'), f'gender for {cid} must be "m" or "f"'
     assert isinstance(p.get('parts'), list) and len(p['parts']) == int(p['total_parts']), 'parts list length must equal total_parts'
     for part in p['parts']:
         assert part.get('summary'), 'every part needs a summary'
@@ -155,8 +185,7 @@ Split it into 2-5 parts (each part ~45-70 seconds of narration+dialogue), each e
 Return JSON:
 {{"story_title": "short Hindi title (max 3 words)",
   "total_parts": N,
-  "characters": {{"id": {{"name": "Hindi name", "name_en": "English name", "gender": "m" or "f", "preset": PRESET, "voice": VOICE,
-                          "look": "IN ENGLISH ONLY: fixed visual description used for every illustration — man/woman, age, build, skin tone, face, hair/beard, clothes and colours, ornaments/weapons; for gods use their traditional iconography (e.g. Shiva: male ascetic god, ash-smeared blue-grey skin, matted hair with crescent moon and Ganga, serpent around neck, trident, tiger-skin) (25-40 words)", ...optional overrides}}}},
+  "characters": {{"id": {{"name": "Hindi name", "name_en": "English name", "gender": "m" or "f", "preset": PRESET, "voice": VOICE, ...optional overrides}}}},
   "main_character": "id",
   "parts": [{{"summary": "English summary of what happens in this part",
              "beats": ["4-6 concrete story beats in order, English"],
@@ -188,7 +217,6 @@ def repair_shots(e, chars):
 def make_validate_episode(chars):
     def v(e):
         repair_shots(e, chars)
-        assert all(s.get('visual') for s in e['scenes']), 'every scene needs a "visual" (English illustration description)'
         assert isinstance(e['hook'], str) and e['hook'].strip().endswith('?'), 'hook must be a question ending with ?'
         assert 6 <= len(e['scenes']) <= 12, 'need 6-12 scenes'
         for s in e['scenes']:
@@ -224,9 +252,7 @@ Characters (use these ids only): {json.dumps(chars, ensure_ascii=False)}
 Write this part. Return JSON:
 {{"hook": "opening narrator QUESTION in Hindi that makes viewers curious, e.g. 'क्या आप जानते हैं...?' / 'क्या होता अगर...?' / 'किसने...?' — must end with ?",
   "hook_bg": BG,
-  "hook_visual": "English description of a striking opening illustration for the hook (who/what, where, mood, camera angle)",
-  "scenes": [{{"speaker": "narrator" or character id, "text": "...", "shot": SHOT,
-              "visual": "English description of the illustration for THIS line: exactly what the line says/shows — which characters (use their English names), what they are doing, facial expression, place, time of day, camera angle (close-up for dialogue, wide for action/places). 20-40 words."}}],   // 7-10 scenes, mix narrator and dialogue, vary shots; the speaking character should usually be in a bust shot of themselves; use 1-3 wide/symbol shots for action
+  "scenes": [{{"speaker": "narrator" or character id, "text": "...", "shot": SHOT}}],   // 7-10 scenes, mix narrator and dialogue, vary shots; the speaking character should usually be in a bust shot of themselves; use 1-3 wide/symbol shots for action
   "cliffhanger": {{"text": "narrator line that {'closes the story with its moral/meaning' if last else 'teases what happens next without resolving it'}", "card": "{'2-4 word Hindi closing title' if last else '2-4 word Hindi title teasing next part'}"}},
   "caption": "Instagram caption in Hindi (1-2 lines) that repeats the hook question and says भाग {part_no}/{plan['total_parts']}",
   "hashtags": ["#..." 8-12 relevant tags, Hindi+English mix],
@@ -245,7 +271,7 @@ def polish(draft, validate, genre, reference=''):
     user = f"""You are the story editor. Improve this {genre} reel script JSON without changing its structure:
 - make the hook a sharper curiosity question; make lines shorter, more emotional and visual; turn dry narration into dialogue where natural
 - keep every scene's speaker ids, keep shot objects valid, keep 6-12 scenes, keep *gold* marks on 1-2 key words per line
-- keep a 'visual' for every scene and make it match its line exactly (who, doing what, where); remove invented named characters; fix any line that doesn't make sense
+- remove invented named characters; fix any line that doesn't make sense; dialogue lines must have the character as speaker (not narrator)
 - fix any fact that contradicts the reference; keep the cliffhanger at peak tension
 {('Reference:' + chr(10) + reference[:2000]) if reference else ''}
 Draft:
