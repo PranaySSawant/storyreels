@@ -5,3 +5,4 @@ soundfile
 requests
 boto3
 cryptography
+edge-tts>=7

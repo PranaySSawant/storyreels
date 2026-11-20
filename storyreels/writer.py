@@ -2,6 +2,7 @@
 import os, json, re, time, requests
 from .art import PRESETS, BACKGROUNDS, POSES, MOODS
 from .tts import VOICE_STYLES
+from . import sources
 
 PROVIDER = (os.environ.get('LLM_PROVIDER') or ('groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
 GROQ_PREFERRED = ['llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
@@ -92,6 +93,16 @@ Genre rules:
 - myth: faithful to the traditional telling, respectful.
 - history: stick to recorded facts with real years and places; anything legendary must be framed as "कहा जाता है..." / "किंवदंती है..."; neutral tone, never communal or hateful toward any religion or community; no glorified gore.
 - ghost: spooky, suspenseful, Instagram-safe (no gore, no self-harm); present it as a legend/folk belief ("लोग कहते हैं...", "कहा जाता है..."), never as proven fact; use backgrounds night, haunted, fort_ruins, village_night, forest; moods scared/shock; end parts on a chilling cliffhanger.
+Storytelling craft (this is what makes people watch to the end and follow):
+- Open in the middle of the drama, never with background. The hook is a curiosity-gap question the viewer cannot answer yet; the part must answer it or raise the stakes.
+- Every part has a mini arc: setup (1-2 lines) -> rising tension -> a turn or reveal -> cliffhanger. Each scene must move the story forward; cut anything that only explains.
+- Show emotion through dialogue: characters speak in their own voice (anger, fear, pride, love). Aim for ~half the scenes as dialogue.
+- Use concrete sensory details (torch light, the sound of conch shells, cold wind, blood-red sky) instead of abstract summary.
+- Plant one surprising, lesser-known fact or detail per part ("बहुत कम लोग जानते हैं...").
+- Short sentences, spoken rhythm, rhetorical questions, dramatic pauses ("..."). Simple everyday Hindi, not Sanskritised.
+- Part 2+ starts with a one-line recap scene: "पिछले भाग में..." (max 14 words), then straight into action.
+- Cliffhanger: stop at the moment of highest tension and leave an open question; the final part ends with a payoff and a one-line meaning/moral.
+- Stay faithful to the reference text when one is given; never invent major events, names or numbers.
 Text rules: every spoken line is Hindi Devanagari, max 18 words, punchy, dramatic, simple words. Wrap 1-2 key words per line in *asterisks* (they render gold). Use "..." for dramatic pauses."""
 
 
@@ -109,11 +120,14 @@ def validate_plan(p):
         assert part['summary']
 
 
-def plan_series(title, brief, genre='myth'):
+def plan_series(title, brief, genre='myth', story_id='', wiki_title=None):
+    src, ref = sources.reference(story_id or title, title, brief, wiki_title=wiki_title)
+    print('reference:', src or 'none')
     user = f"""Plan a multi-part Instagram reel series for this story:
 Title: {title}
 Genre: {genre}
 Brief: {brief}
+{('Reference text (' + src + ') — follow it for facts, names, order of events:' + chr(10) + ref) if ref else ''}
 
 Split it into 2-5 parts (each part ~45-70 seconds of narration+dialogue), each ending on a cliffhanger except the last.
 Return JSON:
@@ -121,10 +135,17 @@ Return JSON:
   "total_parts": N,
   "characters": {{"id": {{"name": "Hindi name", "preset": PRESET, "voice": VOICE, ...optional overrides}}}},
   "main_character": "id",
-  "parts": [{{"summary": "English summary of what happens in this part"}}]
+  "parts": [{{"summary": "English summary of what happens in this part",
+             "beats": ["4-6 concrete story beats in order, English"],
+             "reveal": "the surprising fact/turn in this part",
+             "open_loop": "the unanswered question this part ends on (empty for the last part)"}}]
 }}
+Plan like a showrunner: each part needs its own peak moment; spread the best moments across parts; the last part pays off every open loop.
 ids are short lowercase latin (e.g. "hanuman", "ravan"). Include only characters that appear on screen."""
-    return ask_json(SYSTEM, user, validate_plan)
+    plan = ask_json(SYSTEM, user, validate_plan)
+    plan['reference'] = ref[:5000]
+    plan['reference_source'] = src
+    return plan
 
 
 def make_validate_episode(chars):
@@ -154,7 +175,11 @@ def write_episode(plan, part_no, prev_summary=None, genre='myth'):
 Series: {plan['story_title']} — part {part_no} of {plan['total_parts']}.
 All parts: {json.dumps([p['summary'] for p in plan['parts']], ensure_ascii=False)}
 This part: {part['summary']}
-{'Previous part ended with: ' + prev_summary if prev_summary else ''}
+Beats to cover in order: {json.dumps(part.get('beats', []), ensure_ascii=False)}
+Reveal/surprise: {part.get('reveal', '')}
+End on this open question: {part.get('open_loop', '') if not last else '(final part: pay off everything)'}
+{'Previous part ended with: ' + prev_summary + chr(10) + 'Start with a one-line recap scene beginning "पिछले भाग में..."' if prev_summary else ''}
+{('Reference facts (stay faithful):' + chr(10) + plan['reference'][:2500]) if plan.get('reference') else ''}
 Characters (use these ids only): {json.dumps(chars, ensure_ascii=False)}
 
 Write this part. Return JSON:
@@ -166,10 +191,31 @@ Write this part. Return JSON:
   "hashtags": ["#..." 8-12 relevant tags, Hindi+English mix],
   "summary_for_next": "one English sentence: how this part ended"
 }}"""
-    ep = ask_json(SYSTEM, user, make_validate_episode(chars))
+    validate = make_validate_episode(chars)
+    ep = ask_json(SYSTEM, user, validate)
+    ep = polish(ep, validate, genre, plan.get('reference', ''))
     ep.update(genre=genre, story_title=plan['story_title'], part=part_no, total_parts=int(plan['total_parts']),
               characters=chars, main_character=plan.get('main_character'))
     return ep
+
+
+def polish(draft, validate, genre, reference=''):
+    """Second pass: a story editor tightens the draft for drama, rhythm and accuracy. Falls back to the draft."""
+    user = f"""You are the story editor. Improve this {genre} reel script JSON without changing its structure:
+- make the hook a sharper curiosity question; make lines shorter, more emotional and visual; turn dry narration into dialogue where natural
+- keep every scene's speaker ids, keep shot objects valid, keep 6-12 scenes, keep *gold* marks on 1-2 key words per line
+- fix any fact that contradicts the reference; keep the cliffhanger at peak tension
+{('Reference:' + chr(10) + reference[:2000]) if reference else ''}
+Draft:
+{json.dumps(draft, ensure_ascii=False)}
+Return the full improved JSON only."""
+    try:
+        better = ask_json(SYSTEM, user, validate, tries=2)
+        better.setdefault('summary_for_next', draft.get('summary_for_next'))
+        return better
+    except Exception as e:
+        print('polish skipped:', str(e)[:200])
+        return draft
 
 
 GENRE_HINT = {'myth': 'Indian mythology story (Ramayana, Mahabharata, Puranas, Upanishads, Jataka, legends of saints)',

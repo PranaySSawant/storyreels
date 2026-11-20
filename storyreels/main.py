@@ -59,17 +59,24 @@ def save(st):
 
 
 def next_story(st):
+    """Curated catalog first, then unlimited discovery from Wikipedia, then an LLM suggestion.
+    Returns (id, title, brief, genre, wiki_title)."""
+    import random
+    from . import sources
     done = set(st['done'])
     order = catalog.ORDER
     last = st.get('last_genre')
     start = (order.index(last) + 1) % len(order) if last in order else 0
-    for g in order[start:] + order[:start]:
-        for sid, title, brief in catalog.GENRES[g]:
-            if sid not in done:
-                return sid, title, brief, g
     g = order[start]
+    for sid, title, brief in catalog.GENRES[g]:
+        if sid not in done:
+            return sid, title, brief, g, None
+    found = sources.discover(g, done, random.Random())
+    if found:
+        sid, wt = found
+        return sid, wt, f'Tell the story of "{wt}" from the reference article as a dramatic {g} series.', g, wt
     idea = writer.new_story_idea(list(st['done']), g)
-    return idea['id'], idea['title'], idea['brief'], g
+    return idea['id'], idea['title'], idea['brief'], g, None
 
 
 def caption_for(ep):
@@ -83,9 +90,9 @@ def cycle(st, dry=False):
         if cur:
             st['done'].append(cur['id'])
             st['last_genre'] = cur.get('genre') or st.get('last_genre') or 'myth'
-        sid, title, brief, genre = next_story(st)
-        log(f'new story [{genre}]: {sid} {title}')
-        plan = writer.plan_series(title, brief, genre)
+        sid, title, brief, genre, wiki_title = next_story(st)
+        log(f'new story [{genre}]: {sid} {title}' + (f' (wikipedia: {wiki_title})' if wiki_title else ''))
+        plan = writer.plan_series(title, brief, genre, sid, wiki_title)
         st['last_genre'] = genre
         cur = st['current'] = {'id': sid, 'title': title, 'genre': genre, 'plan': plan, 'next_part': 1, 'prev_summary': None, 'pending': None}
         save(st)
