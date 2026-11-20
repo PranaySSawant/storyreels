@@ -3,58 +3,13 @@ on: workflow_dispatch
 permissions:
   contents: write
 jobs:
-  trial:
+  hide-test-releases:
     runs-on: ubuntu-latest
-    timeout-minutes: 40
-    env:
-      DATA_DIR: ${{ github.workspace }}/trial
-      PIPER_VOICES_DIR: ${{ github.workspace }}/voices
-      RENDER_SCALE: '3'
-      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-      GITHUB_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: {python-version: '3.12', cache: pip}
-      - timeout-minutes: 12
+      - name: Turn TEST releases into private drafts
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          for i in 1 2 3; do
-            sudo timeout 240 apt-get update -qq -o Acquire::Retries=3 && sudo timeout 240 apt-get install -y -qq --no-install-recommends ffmpeg fonts-noto-core && break
-            sleep 10
+          for id in $(gh api repos/${{ github.repository }}/releases --paginate --jq '.[] | select(.tag_name | startswith("test-")) | .id'); do
+            gh api -X PATCH repos/${{ github.repository }}/releases/$id -F draft=true --jq '.tag_name + " draft=" + (.draft|tostring)'
           done
-      - uses: actions/cache@v4
-        with: {path: voices, key: piper-hi-voices-v1}
-      - run: pip install -q -r requirements.txt && bash scripts/get_voices.sh voices && mkdir -p trial
-      - name: Trial reel (new discovered story, part 1) — does not touch live state
-        run: |
-          git fetch -q origin state
-          python - <<'PY'
-          import json, subprocess, os
-          from storyreels import main, writer, render, notify
-          st = json.loads(subprocess.check_output(['git', 'show', 'origin/state:state.json']))
-          st['next_source'] = 'wiki'
-          st['last_genre'] = os.environ.get('TRIAL_AFTER', 'ghost')   # ghost -> next is a myth story
-          import asyncio, edge_tts
-          vs = asyncio.run(edge_tts.list_voices())
-          import requests
-          try:
-              ms = requests.get('https://api.groq.com/openai/v1/models', headers={'Authorization': 'Bearer ' + os.environ['GROQ_API_KEY']}, timeout=20).json()
-              print('GROQ MODELS:', sorted(m['id'] for m in ms.get('data', [])))
-          except Exception as e:
-              print('models?', e)
-          print('HINDI VOICES:', [v['ShortName'] for v in vs if v['Locale'].startswith('hi')])
-          sid, title, brief, genre, wt = main.next_story(st)
-          print('TRIAL STORY:', genre, sid, title, '|', wt, '|', brief)
-          plan = writer.plan_series(title, brief, genre, sid, wt)
-          print('PLAN:', plan['story_title'], plan['total_parts'], 'parts; source:', plan.get('reference_source'))
-          ep = writer.write_episode(plan, 1, None, genre)
-          print('LOOKS:', json.dumps({k: v.get('look') for k, v in plan['characters'].items()}, ensure_ascii=False))
-          print('HOOK:', ep['hook'])
-          for s in ep['scenes']:
-              print('LINE:', s['speaker'], '|', s['text'], '|', s.get('visual'))
-          mp4, cover, dur = render.render_episode(ep, 'trial/work', 'trial/TEST_' + sid + '.mp4')
-          print('rendered', round(dur, 1), 's')
-          ep['story_title'] = 'TEST — ' + ep['story_title']
-          notify.deliver(ep, mp4, mp4[:-4] + '_4k.mp4', cover, main.caption_for(ep), 'test-' + sid)
-          PY
