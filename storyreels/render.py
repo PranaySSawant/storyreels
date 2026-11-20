@@ -160,11 +160,12 @@ class Episode:
                 l['shot'] = dict(type='symbol', kind='spiral', bg=default_bg); symbols += 1
             elif battle and wides < 2 and g != 'ghost':
                 hero = who or last_char
-                enemies = 4 if re.search(r'घेर|महारथी|सेना|सैनिक', text) else 2
-                pose = 'raise' if re.search(r'पहिया|उठा', text) else ('bow' if re.search(r'तीर|बाण|धनुष', text) else 'sword')
-                l['shot'] = dict(type='wide', bg='battlefield', hero=hero, pose=pose, enemies=enemies,
-                                 arrows=bool(re.search(r'तीर|बाण', text)), flash=bool(re.search(r'टूट|तोड़|विस्फोट|प्रहार', text)), with_=None)
-                l['shot']['with'] = None
+                war = re.search(r'युद्ध|रणभूमि|सेना|सैनिक|शत्रु|दुश्मन|महारथी|घेर|हमला|आक्रमण|लड़ाई|भिड़', text)
+                enemies = (4 if re.search(r'घेर|महारथी|सेना|सैनिक', text) else 2) if war else 0
+                pose = 'raise' if re.search(r'पहिया|उठा', text) else ('bow' if re.search(r'तीर|बाण|धनुष|निशान', text) else 'sword')
+                l['shot'] = dict(type='wide', bg='battlefield' if war else (home.get(hero) or default_bg), hero=hero, pose=pose,
+                                 enemies=enemies, arrows=bool(war and re.search(r'तीर|बाण', text)),
+                                 flash=bool(war and re.search(r'टूट|तोड़|विस्फोट|प्रहार', text)), **{'with': None})
                 wides += 1
             elif kind and kind != 'spiral' and symbols < 3 and not (who and kind in ('rays', 'lotus')):
                 l['shot'] = dict(type='symbol', kind=kind, bg=default_bg)

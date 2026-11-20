@@ -115,6 +115,7 @@ PRESETS = {
     'revolutionary':   dict(gender='m', skin=(196, 140, 100), hair=(20, 16, 16), mustache=True, crown='fedora', cloth=(90, 70, 50), young=True),
     'gandhi_cap':      dict(gender='m', skin=(186, 128, 90), hair=(20, 16, 16), mustache=True, crown='topi', cloth=(236, 232, 220)),
     'warrior_queen':   dict(gender='f', skin=(214, 158, 118), hair=(22, 18, 18), crown='safa', turban=(232, 120, 30), tilak='bindi', cloth=(150, 30, 50), armor=True),
+    'tribal_youth':    dict(gender='m', skin=(132, 86, 58), hair=(18, 14, 12), crown='none', cloth=(120, 78, 40), young=True, tilak=None),
     'villager_man':    dict(gender='m', skin=(160, 104, 70), hair=(22, 18, 18), mustache=True, crown='turban', turban=(240, 240, 230), cloth=(210, 200, 180)),
     'villager_woman':  dict(gender='f', skin=(196, 140, 100), hair=(22, 18, 18), veil=(200, 70, 60), tilak='bindi'),
     # --- ghost / horror ---

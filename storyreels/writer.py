@@ -124,7 +124,7 @@ Rendering vocabulary (use ONLY these values):
 - character presets: {', '.join(PRESETS)}
   (blue_god = Krishna/Vishnu style; blue_prince = Ram style; vanara = Hanuman/vanaras; sage = rishis/gurus like Drona, Vishwamitra; villain/demon = antagonists; mother = veiled older woman; queen/princess/goddess for women; boy for children;
    HISTORY: maratha_king = Shivaji-style saffron pagdi + beard; maratha_warrior; rajput_king = safa + beard; emperor = Mughal/sultan style white safa; ancient_king = Maurya/ancient era; chanakya = shaven head with shikha;
-   british_officer = red coat + hat; freedom_fighter = white kurta; gandhi_cap = kurta + white cap; revolutionary = young man with fedora (Bhagat Singh style); warrior_queen = Rani Lakshmibai style; villager_man / villager_woman;
+   british_officer = red coat + hat; freedom_fighter = white kurta; gandhi_cap = kurta + white cap; revolutionary = young man with fedora (Bhagat Singh style); warrior_queen = Rani Lakshmibai style; villager_man / villager_woman; tribal_youth = forest/tribal boy or young hunter (e.g. Eklavya);
    GHOST: ghost_woman = pale chudail/white-saree spirit; ghost_man = pale male spirit; betaal = Betaal / brahmarakshas / pishach; ghost_child)
 - optional character overrides: skin, hair, beard, sash, cloth, drape as hex like "#c08050"; crown one of gold|dark|jata|feather|tiara|turban|none; glow hex (glowing eyes for divine/demonic)
 - voices: {', '.join(VOICE_STYLES)}  (narrator is reserved for the narrator)
