@@ -5,7 +5,7 @@ from .tts import VOICE_STYLES
 from . import sources
 
 PROVIDER = (os.environ.get('LLM_PROVIDER') or ('groq' if os.environ.get('GROQ_API_KEY') else 'anthropic')).lower()
-GROQ_PREFERRED = ['moonshotai/kimi-k2-instruct', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
+GROQ_PREFERRED = ['openai/gpt-oss-120b', 'moonshotai/kimi-k2-instruct', 'llama-3.3-70b-versatile', 'openai/gpt-oss-120b', 'qwen/qwen3-32b', 'llama-3.1-8b-instant']
 _groq_model = None
 
 
@@ -78,7 +78,8 @@ def ask_json(system, user, validate, tries=3):
             validate(data)
             return data
         except (ValueError, KeyError, TypeError, AssertionError) as e:
-            err = str(e)[:400]
+            err = (str(e) or type(e).__name__)[:400]
+            print('LLM answer rejected:', err)
         except requests.RequestException as e:
             err = None; time.sleep(10 * (k + 1))
             if k == tries - 1:
@@ -126,19 +127,19 @@ Text rules: every spoken line is Hindi Devanagari, max 18 words, punchy, dramati
 
 
 def validate_plan(p):
-    assert isinstance(p['story_title'], str) and p['story_title']
-    assert 2 <= int(p['total_parts']) <= 6
-    assert isinstance(p['characters'], dict) and 1 <= len(p['characters']) <= 8
+    assert isinstance(p.get('story_title'), str) and p['story_title'], 'story_title missing'
+    assert 2 <= int(p.get('total_parts', 0)) <= 6, 'total_parts must be 2-6'
+    assert isinstance(p.get('characters'), dict) and 1 <= len(p['characters']) <= 8, 'characters must be an object with 1-8 entries'
     for cid, c in p['characters'].items():
         assert re.fullmatch(r'[a-z_]{2,20}', cid), f'bad id {cid}'
         assert c.get('preset') in PRESETS, f'bad preset {c.get("preset")}'
         assert c.get('voice') in VOICE_STYLES and c['voice'] != 'narrator', f'bad voice for {cid}'
-        assert c.get('name')
+        assert c.get('name'), f'name missing for {cid}'
         assert c.get('look') and not re.search('[\u0900-\u097F]', c['look']), f'look for {cid} must be in ENGLISH'
         assert c.get('gender') in ('m', 'f'), f'gender for {cid} must be "m" or "f"'
-    assert len(p['parts']) == int(p['total_parts'])
+    assert isinstance(p.get('parts'), list) and len(p['parts']) == int(p['total_parts']), 'parts list length must equal total_parts'
     for part in p['parts']:
-        assert part['summary']
+        assert part.get('summary'), 'every part needs a summary'
 
 
 def plan_series(title, brief, genre='myth', story_id='', wiki_title=None):
@@ -164,7 +165,7 @@ Return JSON:
 }}
 Plan like a showrunner: each part needs its own peak moment; spread the best moments across parts; the last part pays off every open loop.
 ids are short lowercase latin (e.g. "hanuman", "ravan"). Include only characters that appear on screen."""
-    plan = ask_json(SYSTEM, user, validate_plan)
+    plan = ask_json(SYSTEM, user, validate_plan, tries=4)
     plan['reference'] = ref[:5000]
     plan['reference_source'] = src
     return plan

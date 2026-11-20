@@ -78,7 +78,7 @@ def next_story(st):
             if sid not in done:
                 st['next_source'] = 'wiki'
                 return sid, title, brief, g, None
-    names = [t for gg in catalog.GENRES.values() for sid, t, _ in gg if sid in done] + [d for d in st['done'] if d not in catalog_ids()]
+    names = [t for gg in catalog.GENRES.values() for sid, t, _ in gg] + [d for d in st['done'] if d not in catalog_ids()]   # done + planned
     found = sources.discover(g, done, random.Random(), judge=lambda t, txt: writer.judge_story(t, txt, g, names))
     if found:
         sid, wt, v = found
