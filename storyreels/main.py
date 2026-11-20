@@ -63,7 +63,7 @@ def catalog_ids():
 
 
 def next_story(st):
-    """Curated catalog first, then unlimited discovery from Wikipedia, then an LLM suggestion.
+    """Alternates a newly discovered Wikipedia story and a curated catalog story; LLM suggestion as last resort.
     Returns (id, title, brief, genre, wiki_title)."""
     import random
     from . import sources
@@ -72,14 +72,22 @@ def next_story(st):
     last = st.get('last_genre')
     start = (order.index(last) + 1) % len(order) if last in order else 0
     g = order[start]
-    for sid, title, brief in catalog.GENRES[g]:
-        if sid not in done:
-            return sid, title, brief, g, None
+    # alternate sources: curated catalog story, then a newly discovered one, then catalog...
+    if st.get('next_source', 'wiki') == 'catalog':
+        for sid, title, brief in catalog.GENRES[g]:
+            if sid not in done:
+                st['next_source'] = 'wiki'
+                return sid, title, brief, g, None
     names = [t for gg in catalog.GENRES.values() for sid, t, _ in gg if sid in done] + [d for d in st['done'] if d not in catalog_ids()]
     found = sources.discover(g, done, random.Random(), judge=lambda t, txt: writer.judge_story(t, txt, g, names))
     if found:
         sid, wt, v = found
+        st['next_source'] = 'catalog'
         return sid, v.get('title') or wt, v.get('brief') or f'The story of "{wt}"', g, wt
+    st['next_source'] = 'wiki'
+    for sid, title, brief in catalog.GENRES[g]:
+        if sid not in done:
+            return sid, title, brief, g, None
     idea = writer.new_story_idea(list(st['done']), g)
     return idea['id'], idea['title'], idea['brief'], g, None
 
