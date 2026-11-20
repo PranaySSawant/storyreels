@@ -33,18 +33,28 @@ def _speakable(text):
 
 
 def _prep(text):
-    t = re.sub(r'\s*\.\.\.\s*', '... ', text)
+    t = text.replace('…', '...').replace('*', '')
+    t = re.sub(r'[“”"‘’]', '', t)
+    t = re.sub(r'\s*\.\.\.\s*', '... ', t)
     return re.sub(r'\s+', ' ', t).strip()
 
 
 def _edge(text, voice, rate, pitch, out_mp3):
-    import edge_tts
+    import edge_tts, time
 
-    async def go():
-        await edge_tts.Communicate(_prep(text), voice, rate=rate, pitch=pitch).save(out_mp3)
-    asyncio.run(go())
-    if not os.path.exists(out_mp3) or os.path.getsize(out_mp3) < 1000:
-        raise RuntimeError('edge-tts returned no audio')
+    async def go(r, p):
+        await edge_tts.Communicate(_prep(text), voice, rate=r, pitch=p).save(out_mp3)
+    last = None
+    for k, (r, p) in enumerate([(rate, pitch), (rate, pitch), ('+0%', '+0Hz'), ('+0%', '+0Hz')]):
+        try:
+            asyncio.run(go(r, p))
+            if os.path.exists(out_mp3) and os.path.getsize(out_mp3) > 1000:
+                return
+            last = 'empty audio'
+        except Exception as e:
+            last = e
+        time.sleep(2 + 3 * k)
+    raise RuntimeError(f'edge-tts: {last}')
 
 
 @lru_cache(None)

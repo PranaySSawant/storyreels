@@ -173,7 +173,7 @@ def validate_plan(p):
 
 
 def plan_series(title, brief, genre='myth', story_id='', wiki_title=None):
-    src, ref = sources.reference(story_id or title, title, brief, wiki_title=wiki_title)
+    src, ref = sources.reference(story_id or title, title, brief, wiki_title=wiki_title) if wiki_title else (None, '')
     print('reference:', src or 'none')
     user = f"""Plan a multi-part Instagram reel series for this story:
 Title: {title}
@@ -200,6 +200,9 @@ ids are short lowercase latin (e.g. "hanuman", "ravan"). Include only characters
     return plan
 
 
+FIRST_PERSON = r'^(मैं|मेरा|मेरी|मेरे|मुझे|मुझको|हम |हमें|हमारा|तुम|आप )'
+
+
 def repair_shots(e, chars):
     first = next(iter(chars))
     for s in e.get('scenes', []):
@@ -219,8 +222,11 @@ def make_validate_episode(chars):
         repair_shots(e, chars)
         assert isinstance(e['hook'], str) and e['hook'].strip().endswith('?'), 'hook must be a question ending with ?'
         assert 6 <= len(e['scenes']) <= 12, 'need 6-12 scenes'
-        for s in e['scenes']:
+        for n, s in enumerate(e['scenes'], 1):
             assert s['speaker'] == 'narrator' or s['speaker'] in chars, f"unknown speaker {s['speaker']}"
+            t = s.get('text', '').replace('*', '').strip()
+            assert not (s['speaker'] == 'narrator' and re.match(FIRST_PERSON, t)), \
+                f'scene {n} "{t[:30]}" is spoken by a character (first/second person): set "speaker" to that character id, not narrator'
             assert isinstance(s['text'], str) and 0 < len(s['text'].split()) <= 26, 'scene text length'
             sh = s['shot']
             assert sh['type'] in ('bust', 'wide', 'symbol'), f"bad shot type {sh['type']}"
