@@ -4,7 +4,7 @@ import re, requests
 UA = {'User-Agent': 'storyreels/1.0 (https://github.com/PranaySSawant/storyreels)'}
 
 
-def _wiki(lang, query, max_chars, exact=False):
+def _wiki(lang, query, max_chars, exact=False, must=None):
     api = f'https://{lang}.wikipedia.org/w/api.php'
     if exact:
         title = query
@@ -15,6 +15,8 @@ def _wiki(lang, query, max_chars, exact=False):
         if not hits:
             return None, None
         title = hits[0]['title']
+        if must and not (set(re.findall(r'[a-z]+', title.lower())) & must):
+            return None, None          # top hit is about something else
     r = requests.get(api, headers=UA, timeout=20, params={'action': 'query', 'prop': 'extracts', 'explaintext': 1,
                                                            'titles': title, 'format': 'json', 'redirects': 1})
     pages = r.json().get('query', {}).get('pages', {})
@@ -27,10 +29,12 @@ def _wiki(lang, query, max_chars, exact=False):
 def reference(story_id, title_hi, brief, max_chars=6000, wiki_title=None):
     """Best-effort: returns (source_label, text) or (None, '')."""
     q = story_id.replace('_', ' ')
+    words = set(w for w in re.findall(r'[a-z]+', (q + ' ' + brief).lower()) if len(w) > 3)
     out, labels = [], []
     for lang, query, n in (('en', wiki_title or q, max_chars), ('hi', title_hi, max_chars // 2)):
         try:
-            t, txt = _wiki(lang, query, n, exact=bool(wiki_title) and lang == 'en')
+            t, txt = _wiki(lang, query, n, exact=bool(wiki_title) and lang == 'en',
+                           must=None if (wiki_title or lang != 'en') else words)
         except Exception:
             t, txt = None, None
         if txt and len(txt) > 400:
@@ -49,7 +53,7 @@ CATEGORIES = {
                 'Women in the Indian independence movement', 'Battles involving the Mughal Empire', 'Sikh warriors'],
     'ghost': ['Reportedly haunted locations in India', 'Indian ghosts', 'Indian legendary creatures',
               'Ghosts in Hindu mythology', 'Urban legends in India', 'Unexplained phenomena in India',
-              'Female ghosts', 'Demons in Hinduism', 'Vetala'],
+              'Demons in Hinduism', 'Vetala', 'Bengali folklore', 'Hindu folklore'],
 }
 
 
