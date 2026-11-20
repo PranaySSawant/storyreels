@@ -58,6 +58,10 @@ def save(st):
     sync_up()
 
 
+def catalog_ids():
+    return {sid for gg in catalog.GENRES.values() for sid, _, _ in gg}
+
+
 def next_story(st):
     """Curated catalog first, then unlimited discovery from Wikipedia, then an LLM suggestion.
     Returns (id, title, brief, genre, wiki_title)."""
@@ -71,7 +75,8 @@ def next_story(st):
     for sid, title, brief in catalog.GENRES[g]:
         if sid not in done:
             return sid, title, brief, g, None
-    found = sources.discover(g, done, random.Random(), judge=lambda t, txt: writer.judge_story(t, txt, g))
+    names = [t for gg in catalog.GENRES.values() for sid, t, _ in gg if sid in done] + [d for d in st['done'] if d not in catalog_ids()]
+    found = sources.discover(g, done, random.Random(), judge=lambda t, txt: writer.judge_story(t, txt, g, names))
     if found:
         sid, wt, v = found
         return sid, v.get('title') or wt, v.get('brief') or f'The story of "{wt}"', g, wt

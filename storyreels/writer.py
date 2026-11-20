@@ -218,13 +218,13 @@ Return the full improved JSON only."""
         return draft
 
 
-def judge_story(title, text, genre):
+def judge_story(title, text, genre, done_names=()):
     """Is this Wikipedia article a dramatic story worth a reel series? Returns {'title','brief'} or None."""
     user = f"""Genre: {genre}. Wikipedia article "{title}":
 {text[:1800]}
 
 Is this a dramatic STORY (events, conflict, a person or place with a tellable legend) that would make a gripping 2-5 part Hindi reel series for an Indian audience in this genre?
-It MUST be Indian (set in India / Indian tradition). Foreign legends, concepts, lists, texts/books, generic topics, modern politics, or stories outside the genre -> no.
+It MUST be Indian (set in India / Indian tradition). It must NOT be the same story as one already made: {json.dumps(list(done_names)[-150:], ensure_ascii=False)}. Foreign legends, concepts, lists, texts/books, generic topics, modern politics, or stories outside the genre -> no.
 Return JSON: {{"ok": true|false, "title": "short Hindi title (2-4 words)", "brief": "one-line English summary of the story arc"}}"""
     try:
         d = ask_json(SYSTEM, user, lambda d: d['ok'] in (True, False), tries=2)
