@@ -114,3 +114,14 @@ def discover(genre, done_ids, rng, judge=None, tries=10):
             if checked >= tries:
                 return None
     return None
+
+
+def search_title(query):
+    """Best matching English Wikipedia article title for a specific episode, or None."""
+    try:
+        r = requests.get('https://en.wikipedia.org/w/api.php', headers=UA, timeout=20,
+                         params={'action': 'query', 'list': 'search', 'srsearch': query, 'srlimit': 1, 'format': 'json'})
+        hits = r.json().get('query', {}).get('search', [])
+        return hits[0]['title'] if hits else None
+    except Exception:
+        return None

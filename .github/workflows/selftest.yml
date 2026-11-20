@@ -37,6 +37,12 @@ jobs:
           st['last_genre'] = os.environ.get('TRIAL_AFTER', 'ghost')   # ghost -> next is a myth story
           import asyncio, edge_tts
           vs = asyncio.run(edge_tts.list_voices())
+          import requests
+          try:
+              ms = requests.get('https://api.groq.com/openai/v1/models', headers={'Authorization': 'Bearer ' + os.environ['GROQ_API_KEY']}, timeout=20).json()
+              print('GROQ MODELS:', sorted(m['id'] for m in ms.get('data', [])))
+          except Exception as e:
+              print('models?', e)
           print('HINDI VOICES:', [v['ShortName'] for v in vs if v['Locale'].startswith('hi')])
           sid, title, brief, genre, wt = main.next_story(st)
           print('TRIAL STORY:', genre, sid, title, '|', wt, '|', brief)

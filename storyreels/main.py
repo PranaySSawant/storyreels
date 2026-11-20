@@ -83,6 +83,11 @@ def next_story(st):
     if found:
         sid, wt, v = found
         st['next_source'] = 'catalog'
+        ep_en = (v.get('episode_en') or '').strip()
+        if ep_en and ep_en.lower() != wt.lower():
+            hit = sources.search_title(ep_en)
+            if hit:
+                wt = hit
         return sid, v.get('title') or wt, v.get('brief') or f'The story of "{wt}"', g, wt
     st['next_source'] = 'wiki'
     for sid, title, brief in catalog.GENRES[g]:

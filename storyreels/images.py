@@ -15,17 +15,20 @@ STYLE = {
     'ghost': 'Indian horror folk tale, dark atmospheric 2D digital painting, cinematic, moonlight, fog, deep shadows, '
              'eerie teal and amber tones, suspenseful mood',
 }
+SAFE = 'respectful dignified devotional depiction, everyone fully clothed in modest traditional attire, family-friendly, no nudity, no gore'
 TAIL = 'vertical 9:16 composition, single coherent scene, highly detailed, no text, no letters, no watermark, no frame'
 
 ENDPOINT = os.environ.get('IMAGE_ENDPOINT', 'https://image.pollinations.ai/prompt/')
 MODEL = os.environ.get('IMAGE_MODEL', 'flux')
 _disabled = False
+_last = [0.0]
+GAP = float(os.environ.get('IMAGE_GAP', '47'))     # free tier: 1 image / 45 s per IP
 
 
 def build_prompt(genre, visual, looks):
     """looks: list of 'Name: appearance' strings for characters in this scene."""
     who = ('Characters: ' + '; '.join(looks) + '. ') if looks else ''
-    return f"{STYLE.get(genre, STYLE['myth'])}. {who}Scene: {visual}. {TAIL}"
+    return f"{STYLE.get(genre, STYLE['myth'])}. {SAFE}. {who}Scene: {visual}. {TAIL}"
 
 
 def generate(prompt, out_path, seed, w=1080, h=1920, tries=4):
@@ -37,8 +40,12 @@ def generate(prompt, out_path, seed, w=1080, h=1920, tries=4):
     url = ENDPOINT + urllib.parse.quote(prompt[:1800], safe='')
     params = {'width': w, 'height': h, 'seed': seed, 'model': MODEL, 'nologo': 'true', 'enhance': 'false', 'safe': 'true'}
     for k in range(tries):
+        wait = GAP - (time.time() - _last[0])
+        if wait > 0:
+            time.sleep(wait)
         try:
-            r = requests.get(url, params=params, timeout=120)
+            _last[0] = time.time()
+            r = requests.get(url, params=params, timeout=150)
             if r.status_code == 200 and r.headers.get('content-type', '').startswith('image') and len(r.content) > 20000:
                 tmp = out_path + '.tmp'
                 open(tmp, 'wb').write(r.content)
@@ -51,8 +58,11 @@ def generate(prompt, out_path, seed, w=1080, h=1920, tries=4):
             print(f'image: HTTP {r.status_code} {r.text[:120] if not r.headers.get("content-type", "").startswith("image") else ""}')
         except Exception as e:
             print('image error:', str(e)[:150])
-        time.sleep(8 * (k + 1))
+        time.sleep(5)
     return None
+
+
+FEMALE = {'queen', 'princess', 'mother', 'goddess', 'warrior_queen', 'villager_woman', 'ghost_woman'}
 
 
 def seed_for(*parts):
@@ -64,7 +74,10 @@ def scene_images(ep, workdir, log=print):
     global _disabled
     genre = ep.get('genre', 'myth')
     chars = ep.get('characters', {})
-    looks_all = {cid: f"{c.get('name_en') or cid} ({c.get('look', '')})" for cid, c in chars.items() if c.get('look')}
+    def look(c, cid):
+        g = {'m': 'a man', 'f': 'a woman'}.get(c.get('gender') or ('f' if c.get('preset') in FEMALE else 'm'), '')
+        return f"{c.get('name_en') or cid} ({g}; {c.get('look', '')})"
+    looks_all = {cid: look(c, cid) for cid, c in chars.items() if c.get('look')}
     out, fails = {}, 0
     jobs = [(0, ep.get('hook_visual') or (ep['scenes'][0].get('visual') if ep['scenes'] else ''), ep.get('main_character'))]
     for i, s in enumerate(ep['scenes'], start=1):
@@ -85,4 +98,9 @@ def scene_images(ep, workdir, log=print):
                 _disabled = True
                 break
     log(f'images: {len(out)}/{len(jobs)} generated')
+    if out:   # keep one consistent painted style: lines without an image reuse the nearest painted scene
+        have = sorted(out)
+        for i, _, _ in jobs:
+            if i not in out:
+                out[i] = out[min(have, key=lambda k: (abs(k - i), k > i))]
     return out

@@ -134,6 +134,8 @@ def validate_plan(p):
         assert c.get('preset') in PRESETS, f'bad preset {c.get("preset")}'
         assert c.get('voice') in VOICE_STYLES and c['voice'] != 'narrator', f'bad voice for {cid}'
         assert c.get('name')
+        assert c.get('look') and not re.search('[\u0900-\u097F]', c['look']), f'look for {cid} must be in ENGLISH'
+        assert c.get('gender') in ('m', 'f'), f'gender for {cid} must be "m" or "f"'
     assert len(p['parts']) == int(p['total_parts'])
     for part in p['parts']:
         assert part['summary']
@@ -152,8 +154,8 @@ Split it into 2-5 parts (each part ~45-70 seconds of narration+dialogue), each e
 Return JSON:
 {{"story_title": "short Hindi title (max 3 words)",
   "total_parts": N,
-  "characters": {{"id": {{"name": "Hindi name", "name_en": "English name", "preset": PRESET, "voice": VOICE,
-                          "look": "fixed English visual description used for every illustration: age, build, skin tone, face, hair/beard, clothes and colours, ornaments/weapons (25-40 words)", ...optional overrides}}}},
+  "characters": {{"id": {{"name": "Hindi name", "name_en": "English name", "gender": "m" or "f", "preset": PRESET, "voice": VOICE,
+                          "look": "IN ENGLISH ONLY: fixed visual description used for every illustration — man/woman, age, build, skin tone, face, hair/beard, clothes and colours, ornaments/weapons; for gods use their traditional iconography (e.g. Shiva: male ascetic god, ash-smeared blue-grey skin, matted hair with crescent moon and Ganga, serpent around neck, trident, tiger-skin) (25-40 words)", ...optional overrides}}}},
   "main_character": "id",
   "parts": [{{"summary": "English summary of what happens in this part",
              "beats": ["4-6 concrete story beats in order, English"],
@@ -168,8 +170,24 @@ ids are short lowercase latin (e.g. "hanuman", "ravan"). Include only characters
     return plan
 
 
+def repair_shots(e, chars):
+    first = next(iter(chars))
+    for s in e.get('scenes', []):
+        sh = s.get('shot') or {}
+        sp = s.get('speaker')
+        if sh.get('type') not in ('bust', 'wide', 'symbol') or (sh.get('type') == 'bust' and sh.get('char') not in chars) \
+                or (sh.get('type') == 'wide' and sh.get('hero') not in chars):
+            s['shot'] = {'type': 'bust', 'char': sp if sp in chars else first, 'bg': sh.get('bg', 'palace_red'), 'mood': sh.get('mood', 'calm')}
+        if s['shot'].get('bg') not in BACKGROUNDS:
+            s['shot']['bg'] = 'night'
+        if s.get('speaker') != 'narrator' and s.get('speaker') not in chars:
+            s['speaker'] = 'narrator'
+
+
 def make_validate_episode(chars):
     def v(e):
+        repair_shots(e, chars)
+        assert all(s.get('visual') for s in e['scenes']), 'every scene needs a "visual" (English illustration description)'
         assert isinstance(e['hook'], str) and e['hook'].strip().endswith('?'), 'hook must be a question ending with ?'
         assert 6 <= len(e['scenes']) <= 12, 'need 6-12 scenes'
         for s in e['scenes']:
@@ -248,7 +266,8 @@ def judge_story(title, text, genre, done_names=()):
 
 Is this a dramatic STORY (events, conflict, a person or place with a tellable legend) that would make a gripping 2-5 part Hindi reel series for an Indian audience in this genre?
 It MUST be Indian (set in India / Indian tradition). It must NOT be the same story as one already made: {json.dumps(list(done_names)[-150:], ensure_ascii=False)}. Foreign legends, concepts, lists, texts/books, generic topics, modern politics, or stories outside the genre -> no.
-Return JSON: {{"ok": true|false, "title": "short Hindi title (2-4 words)", "brief": "one-line English summary of the story arc"}}"""
+If the article is broad (a deity, a person's whole life, a whole place), pick ONE specific famous dramatic episode from it.
+Return JSON: {{"ok": true|false, "title": "short Hindi title (2-4 words)", "episode_en": "English name of that specific episode/legend for searching Wikipedia", "brief": "one-line English summary of the story arc"}}"""
     try:
         d = ask_json(SYSTEM, user, lambda d: d['ok'] in (True, False), tries=2)
     except Exception:
