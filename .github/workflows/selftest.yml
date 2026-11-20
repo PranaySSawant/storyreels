@@ -1,28 +1,43 @@
 name: selftest
 on: workflow_dispatch
+permissions:
+  contents: write
 jobs:
-  test:
+  trial:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 40
+    env:
+      DATA_DIR: ${{ github.workspace }}/trial
+      PIPER_VOICES_DIR: ${{ github.workspace }}/voices
+      RENDER_SCALE: '3'
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      GITHUB_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: {python-version: '3.12', cache: pip}
-      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
-      - run: pip install -q -r requirements.txt
-      - name: voices + sources
-        env:
-          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg fonts-noto-core
+      - uses: actions/cache@v4
+        with: {path: voices, key: piper-hi-voices-v1}
+      - run: pip install -q -r requirements.txt && bash scripts/get_voices.sh voices && mkdir -p trial
+      - name: Trial reel (new discovered story, part 1) — does not touch live state
         run: |
+          git fetch -q origin state
           python - <<'PY'
-          import random
-          from storyreels import tts, sources, writer
-          for s in ('narrator', 'villain', 'woman', 'child'):
-              print(s, round(tts.synth('पिछले भाग में... अभिमन्यु चक्रव्यूह में अकेला रह गया था।', s, f'/tmp/{s}.wav'), 2))
-          l, t = sources.reference('karna_kavach', 'कर्ण', 'Indra asks Karna for his armour')
-          print('reference:', l, len(t))
-          for g in ('myth', 'history', 'ghost'):
-              f = sources.discover(g, set(), random.Random(), judge=lambda t, x: writer.judge_story(t, x, g))
-              print('FOUND', g, f and (f[1], f[2].get('title'), f[2].get('brief')))
+          import json, subprocess, os
+          from storyreels import main, writer, render, notify
+          st = json.loads(subprocess.check_output(['git', 'show', 'origin/state:state.json']))
+          st['next_source'] = 'wiki'
+          st['last_genre'] = 'history'          # -> ghost turn
+          sid, title, brief, genre, wt = main.next_story(st)
+          print('TRIAL STORY:', genre, sid, title, '|', wt, '|', brief)
+          plan = writer.plan_series(title, brief, genre, sid, wt)
+          print('PLAN:', plan['story_title'], plan['total_parts'], 'parts; source:', plan.get('reference_source'))
+          ep = writer.write_episode(plan, 1, None, genre)
+          print(json.dumps({k: ep[k] for k in ('hook', 'scenes', 'cliffhanger')}, ensure_ascii=False, indent=1))
+          mp4, cover, dur = render.render_episode(ep, 'trial/work', 'trial/TEST_' + sid + '.mp4')
+          print('rendered', round(dur, 1), 's')
+          ep['story_title'] = 'TEST — ' + ep['story_title']
+          notify.deliver(ep, mp4, mp4[:-4] + '_4k.mp4', cover, main.caption_for(ep), 'test-' + sid)
           PY
