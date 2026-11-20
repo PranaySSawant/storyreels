@@ -218,6 +218,21 @@ Return the full improved JSON only."""
         return draft
 
 
+def judge_story(title, text, genre):
+    """Is this Wikipedia article a dramatic story worth a reel series? Returns {'title','brief'} or None."""
+    user = f"""Genre: {genre}. Wikipedia article "{title}":
+{text[:1800]}
+
+Is this a dramatic STORY (events, conflict, a person or place with a tellable legend) that would make a gripping 2-5 part Hindi reel series for an Indian audience in this genre?
+Concepts, lists, texts/books, generic topics, modern politics, or stories outside the genre -> no.
+Return JSON: {{"ok": true|false, "title": "short Hindi title (2-4 words)", "brief": "one-line English summary of the story arc"}}"""
+    try:
+        d = ask_json(SYSTEM, user, lambda d: d['ok'] in (True, False), tries=2)
+    except Exception:
+        return None
+    return d if d.get('ok') else None
+
+
 GENRE_HINT = {'myth': 'Indian mythology story (Ramayana, Mahabharata, Puranas, Upanishads, Jataka, legends of saints)',
               'history': 'true Indian historical story (ancient to freedom struggle) with real people, years and places',
               'ghost': 'famous Indian ghost legend, haunted place or folk-horror tale'}

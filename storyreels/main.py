@@ -71,10 +71,10 @@ def next_story(st):
     for sid, title, brief in catalog.GENRES[g]:
         if sid not in done:
             return sid, title, brief, g, None
-    found = sources.discover(g, done, random.Random())
+    found = sources.discover(g, done, random.Random(), judge=lambda t, txt: writer.judge_story(t, txt, g))
     if found:
-        sid, wt = found
-        return sid, wt, f'Tell the story of "{wt}" from the reference article as a dramatic {g} series.', g, wt
+        sid, wt, v = found
+        return sid, v.get('title') or wt, v.get('brief') or f'The story of "{wt}"', g, wt
     idea = writer.new_story_idea(list(st['done']), g)
     return idea['id'], idea['title'], idea['brief'], g, None
 

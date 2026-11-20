@@ -11,14 +11,18 @@ jobs:
       - run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
       - run: pip install -q -r requirements.txt
       - name: voices + sources
+        env:
+          GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: |
           python - <<'PY'
           import random
-          from storyreels import tts, sources
+          from storyreels import tts, sources, writer
           for s in ('narrator', 'villain', 'woman', 'child'):
               print(s, round(tts.synth('पिछले भाग में... अभिमन्यु चक्रव्यूह में अकेला रह गया था।', s, f'/tmp/{s}.wav'), 2))
           l, t = sources.reference('karna_kavach', 'कर्ण', 'Indra asks Karna for his armour')
           print('reference:', l, len(t))
           for g in ('myth', 'history', 'ghost'):
-              print(g, sources.discover(g, set(), random.Random(1)))
+              f = sources.discover(g, set(), random.Random(), judge=lambda t, x: writer.judge_story(t, x, g))
+              print('FOUND', g, f and (f[1], f[2].get('title'), f[2].get('brief')))
           PY

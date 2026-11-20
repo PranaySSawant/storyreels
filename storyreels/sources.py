@@ -26,7 +26,7 @@ def _wiki(lang, query, max_chars, exact=False):
 
 def reference(story_id, title_hi, brief, max_chars=6000, wiki_title=None):
     """Best-effort: returns (source_label, text) or (None, '')."""
-    q = story_id.replace('_', ' ') + ' ' + ' '.join(re.findall(r'[A-Za-z]+', brief)[:6])
+    q = story_id.replace('_', ' ')
     out, labels = [], []
     for lang, query, n in (('en', wiki_title or q, max_chars), ('hi', title_hi, max_chars // 2)):
         try:
@@ -48,7 +48,8 @@ CATEGORIES = {
                 'Revolutionary movement for Indian independence', 'Indian independence activists',
                 'Women in the Indian independence movement', 'Battles involving the Mughal Empire', 'Sikh warriors'],
     'ghost': ['Reportedly haunted locations in India', 'Indian ghosts', 'Indian legendary creatures',
-              'Indian folklore', 'Ghosts in Hindu mythology', 'Urban legends in India', 'Unexplained phenomena in India'],
+              'Ghosts in Hindu mythology', 'Urban legends in India', 'Unexplained phenomena in India',
+              'Female ghosts', 'Demons in Hinduism', 'Vetala'],
 }
 
 
@@ -77,19 +78,35 @@ def slug(title):
     return re.sub(r'[^a-z0-9]+', '_', title.lower()).strip('_')[:40]
 
 
-def discover(genre, done_ids, rng):
-    """Pick an unused Wikipedia article for this genre that is long enough to tell as a story.
-    Returns (id, en_title) or None."""
+KEYWORDS = {
+    'myth': r'\b(Mahabharata|Ramayana|Purana|Vishnu|Shiva|Krishna|Rama|Devi|asura|rakshasa|curse|boon|sage|king|battle|slay|legend)\b',
+    'history': r'\b(battle|fought|army|siege|killed|executed|escaped|captured|revolt|rebellion|war|fort|arrest)\b',
+    'ghost': r'\b(haunted|ghost|spirit|paranormal|curse|legend|apparition|witch|demon|supernatural|vampire|possess)\b',
+}
+SKIP = ('List of', 'Index of', 'Outline of', 'Timeline of', 'Bibliography', 'Glossary')
+
+
+def discover(genre, done_ids, rng, judge=None, tries=10):
+    """Pick an unused Wikipedia article for this genre that reads like a story.
+    judge(title, text) -> dict|None lets the LLM confirm it is a dramatic, tellable story.
+    Returns (id, en_title, judged) or None."""
     cats = list(CATEGORIES.get(genre, []))
     rng.shuffle(cats)
+    checked = 0
     for cat in cats:
-        titles = [t for t in _members(cat) if slug(t) not in done_ids and not t.startswith(('List of', 'Index of', 'Outline of'))]
+        titles = [t for t in _members(cat) if slug(t) not in done_ids and not t.startswith(SKIP)]
         rng.shuffle(titles)
-        for t in titles[:12]:
+        for t in titles[:8]:
             try:
                 _, txt = _wiki('en', t, 8000, exact=True)
             except Exception:
                 continue
-            if txt and len(txt) > 2500:
-                return slug(t), t
+            if not txt or len(txt) < 2500 or len(re.findall(KEYWORDS[genre], txt, re.I)) < 6:
+                continue
+            checked += 1
+            verdict = judge(t, txt) if judge else {}
+            if verdict is not None:
+                return slug(t), t, verdict
+            if checked >= tries:
+                return None
     return None
