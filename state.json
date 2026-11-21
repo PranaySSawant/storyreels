@@ -1,0 +1,345 @@
+{
+ "done": [
+  "chakravyuh",
+  "afzal_khan",
+  "vikram_betaal",
+  "ahiravan",
+  "agra_escape",
+  "bhangarh",
+  "karna_kavach",
+  "tanaji",
+  "kuldhara"
+ ],
+ "current": {
+  "id": "eklavya",
+  "title": "एकलव्य का अंगूठा",
+  "genre": "myth",
+  "plan": {
+   "story_title": "एकलव्य अंगूठा",
+   "total_parts": 4,
+   "characters": {
+    "eklavya": {
+     "name": "एकलव्य",
+     "preset": "warrior",
+     "voice": "man"
+    },
+    "drona": {
+     "name": "द्रोणाचार्य",
+     "preset": "sage",
+     "voice": "old_man"
+    },
+    "kuru": {
+     "name": "धृतराष्ट्र",
+     "preset": "king",
+     "voice": "old_man"
+    },
+    "gopal": {
+     "name": "गोपाल",
+     "preset": "villager_man",
+     "voice": "man"
+    }
+   },
+   "main_character": "eklavya",
+   "parts": [
+    {
+     "summary": "Eklavya watches Drona train princes, builds his own idol and hones archery in secret.",
+     "beats": [
+      "Eklavya watches Drona’s class and is turned away",
+      "He returns home, crafts a clay idol of Drona",
+      "He practices daily, arrows striking the banyan tree",
+      "Villagers hear of a mysterious archer in the forest"
+     ],
+     "reveal": "बहुत कम लोग जानते हैं कि एकलव्य ने अपनी खुद की ध्वज बनाकर अभ्यास किया।",
+     "open_loop": "क्या द्रोण इस अनजान तीरंदाज़ को देख पाएँगे?"
+    },
+    {
+     "summary": "Drona learns of the forest archer, confronts Eklavya and learns he follows Drona’s idol.",
+     "beats": [
+      "Scouts report a flawless archer",
+      "Drona visits the forest and finds the idol",
+      "He meets Eklavya, who bows before the statue",
+      "Eklavya declares himself a disciple of the idol"
+     ],
+     "reveal": "एकलव्य ने द्रोण के चरणों में अपना खुद का तीर धारण किया था।",
+     "open_loop": "द्रोण अब एकलव्य से क्या माँगेंगे?"
+    },
+    {
+     "summary": "Drona, impressed, asks for the ultimate guru‑dakshina – Eklavya’s right thumb.",
+     "beats": [
+      "Drona praises Eklavya’s skill",
+      "He demands a guru‑dakshina: the right thumb",
+      "Eklavya, shocked, accepts without protest",
+      "He cuts off his thumb and offers it on the altar"
+     ],
+     "reveal": "एकलव्य ने अंगूठा काटते समय अपने घुंघराले बालों को भी काट लिया था।",
+     "open_loop": "क्या द्रोण इस बलिदान को स्वीकार करेंगे?"
+    },
+    {
+     "summary": "Drona accepts the thumb, blesses Eklavya, and his legend lives on; modern temples honor the sacrifice.",
+     "beats": [
+      "Drona accepts the thumb, blesses Eklavya’s one‑handed aim",
+      "Eklavya becomes the greatest archer despite the loss",
+      "Centuries later, Gurgaon’s Eklavya temple commemorates the act",
+      "A final line ties the ancient sacrifice to today’s reverence"
+     ],
+     "reveal": "गुड़गांव के एकलव्य मंदिर में अंगूठा नहीं, बल्कि उसके *छाया* को पूजा जाता है।",
+     "open_loop": ""
+    }
+   ],
+   "reference": "Eklavya: The Royal Guard is a 2007 Indian Hindi-language epic crime drama film directed by Vidhu Vinod Chopra. It stars an ensemble cast of Amitabh Bachchan, Saif Ali Khan, Sharmila Tagore, Sanjay Dutt, Vidya Balan, Raima Sen, Jackie Shroff, Jimmy Sheirgill and Boman Irani. The film marks Vidhu Vinod Chopra's return to film direction after seven years.\nEklavya: The Royal Guard was theatrically released on 16 February 2007. It was a major box office disappointment Despite this, the film was chosen as India's official entry to the Oscars to be considered for nomination in the Best Foreign Film category for the year 2007.\n\n== Plot ==\nContemporary India. A majestic fort. A royal dynasty that no longer rules. A king without a kingdom. Yet Eklavya (Amitabh Bachchan), their royal guard, lives in a time warp. He lives only to protect the fort, the dynasty, and the king. For nine generations, Eklavya's family has protected Devigarh, a centuries-old citadel in Rajasthan. His marksmanship is the stuff of legends. His unflinching loyalty inspires ballads. Eklavya has spent his entire life serving the royals and closely guarding their secrets, but now he's getting old and increasingly blind. Unable to cope with the suffocating customs of his land, the heir, Prince Harshwardhan (Saif Ali Khan), has stayed away in London. But the sudden demise of the queen, Rani Suhasinidevi (Sharmila Tagore), forces the prince back to the kingdom he had left behind. The queen leaves a letter for her son in which she tells him that his biological father is actually Eklavya.\nThe prince's return brings a rush of joy into the moribund fort. His mentally challenged twin sister, Princess Nandini (Raima Sen), and his childhood love, Rajjo (Vidya Balan), are delighted to see him. But the joy of reunion is short-lived.\nThere is unrest in the kingdom: farmers are being stripped of their lands. The king, Rana Jaywardhan (Boman Irani), influenced by his brother, Rana Jyotiwardhan (Jackie Shroff), supports the atrocities being forced upon the helpless peasants. The king receives a death threat over the phone. An irreverent police officer, Pannalal Chohar (Sanjay Dutt), is called in to investigate. But he might be too late. The fragile peace of the land is suddenly shattered by a barrage of bullets. Jaywardhan (Boman Irani) instructs his brother to kill Eklavya (Bacchan) in a fit of rage, but his brother (Shroff) betrays him and kills him and his driver (Rajjo's father). And amidst the mayhem, the safely guarded secrets of the fort are revealed.\nEklavya suspects Jyotiwardhan and his son, Udaywardhan (Jimmy Sheirgill), are responsible for Jaywardhan's (Boman Irani) death. He kills Udaywardhan and leads Jyotiwardhan to Udaywardhan's body, intending to kill him and fulfill his oath, whereupon Jyotiwardhan reveals to Eklavya that it was the prince who ordered the murder of the king. Shouting in denial, Eklavya kills Jyotiwardhan, knowing he must face the young prince, his son, to finally fulfill his dharma.\nHarshwardhan (Saif Ali Khan), overcome with guilt, reveals his hand in the murder of Jaywardhan to Rajjo, who leaves him because his actions also caused the death of her father. When Eklavya comes to the palace to kill the prince, he explains why he killed the king. The King had murdered the Queen when she, in her semi-conscious state, kept saying Eklavya's name. Eklavya finally fulfills his dharma by sparing his son's life and declared his own pre-conceived notions to be wrong. Rajjo eventually forgives Harshwardhan because she believes that he is truly sorry for his actions, and Pannalal (Sanjay Dutt) finds a suicide note saying that Udaywardhan and Jyotiwardhan, afraid that they were about to be caught, jumped in front of a train. Harshwardhan finally reveals Eklavya to be his true father in front of the entire village.\n\n== Cast ==\nAmitabh Bachchan as Eklavya\nSaif Ali Khan as Prince Harshvardhan Rana\nSanjay Dutt as DSP Pannalal Chohar\nVidya Balan as Rajjo Singh\nJackie Shroff as Rana Jyotiwardhan\nBoman Irani as Rana Jayvardhan\nJimmy Sheirgill as Prince Udaywardhan Rana\nRaima Sen as Princess Nandini\nSharmila Tagore as Rani Suhasinidevi\nParikshat Sahni as Omkar Singh, Rajjo's father\nPankaj Jha as a peasant villager\nSwanand Kirkire as Constable\n\n== Production ==\nThe film was originally titled Yagna. Principal photography was completed in November 2005. The primary filming location was Devigarh and Udaipur, Rajasthan. Raghavendra Rathore and Subarna Rai Chaudhari designed the costumes for the film. The action sequences were initially planned to take place in Egypt but were instead shot near Bikaner. 600 camels were used in the shoot.\n\n== Music ==\nShantanu Moitra, who was the music director of Parineeta (2005), composed the music for the film. The soundtrack to Eklavya: The Royal Guard was released on 15 February 2007.\n\n== Controversies ==\nThere was a controversy regarding selecting the film as India's official entry to the Best Foreign Film Academy award",
+   "reference_source": "en.wikipedia: Eklavya: The Royal Guard; hi.wikipedia: एकलव्य मंदिर"
+  },
+  "next_part": 2,
+  "prev_summary": "गाँव में रहस्य फैलता है, द्रोण (राजा) इसे देख पाएँगे या नहीं, अगले भाग में पता चलेगा।",
+  "pending": null
+ },
+ "posts": [
+  {
+   "t": 1795073158,
+   "story": "chakravyuh",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p1_1795072743/chakravyuh_p1_1795072743.mp4"
+  },
+  {
+   "t": 1795079554,
+   "story": "chakravyuh",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p2_1795078936/chakravyuh_p2_1795078936.mp4"
+  },
+  {
+   "t": 1795088889,
+   "story": "chakravyuh",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p3_1795088280/chakravyuh_p3_1795088280.mp4"
+  },
+  {
+   "t": 1795092541,
+   "story": "chakravyuh",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p4_1795092176/chakravyuh_p4_1795092176.mp4"
+  },
+  {
+   "t": 1795095916,
+   "story": "afzal_khan",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p1_1795095467/afzal_khan_p1_1795095467.mp4"
+  },
+  {
+   "t": 1795099679,
+   "story": "afzal_khan",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p2_1795099050/afzal_khan_p2_1795099050.mp4"
+  },
+  {
+   "t": 1795103618,
+   "story": "afzal_khan",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p3_1795103177/afzal_khan_p3_1795103177.mp4"
+  },
+  {
+   "t": 1795106723,
+   "story": "vikram_betaal",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p1_1795106247/vikram_betaal_p1_1795106247.mp4"
+  },
+  {
+   "t": 1795110383,
+   "story": "vikram_betaal",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p2_1795109864/vikram_betaal_p2_1795109864.mp4"
+  },
+  {
+   "t": 1795114032,
+   "story": "vikram_betaal",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p3_1795113450/vikram_betaal_p3_1795113450.mp4"
+  },
+  {
+   "t": 1795117493,
+   "story": "vikram_betaal",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p4_1795117054/vikram_betaal_p4_1795117054.mp4"
+  },
+  {
+   "t": 1795121025,
+   "story": "ahiravan",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p1_1795120662/ahiravan_p1_1795120662.mp4"
+  },
+  {
+   "t": 1795124638,
+   "story": "ahiravan",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p2_1795124263/ahiravan_p2_1795124263.mp4"
+  },
+  {
+   "t": 1795128507,
+   "story": "ahiravan",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p3_1795127887/ahiravan_p3_1795127887.mp4"
+  },
+  {
+   "t": 1795132294,
+   "story": "ahiravan",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p4_1795131857/ahiravan_p4_1795131857.mp4"
+  },
+  {
+   "t": 1795135453,
+   "story": "agra_escape",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p1_1795135063/agra_escape_p1_1795135063.mp4"
+  },
+  {
+   "t": 1795139123,
+   "story": "agra_escape",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p2_1795138671/agra_escape_p2_1795138671.mp4"
+  },
+  {
+   "t": 1795149811,
+   "story": "agra_escape",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p3_1795149464/agra_escape_p3_1795149464.mp4"
+  },
+  {
+   "t": 1795153480,
+   "story": "agra_escape",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p4_1795153073/agra_escape_p4_1795153073.mp4"
+  },
+  {
+   "t": 1795157432,
+   "story": "bhangarh",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p1_1795156983/bhangarh_p1_1795156983.mp4"
+  },
+  {
+   "t": 1795160932,
+   "story": "bhangarh",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p2_1795160274/bhangarh_p2_1795160274.mp4"
+  },
+  {
+   "t": 1795164457,
+   "story": "bhangarh",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p3_1795163888/bhangarh_p3_1795163888.mp4"
+  },
+  {
+   "t": 1795168028,
+   "story": "bhangarh",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p4_1795167481/bhangarh_p4_1795167481.mp4"
+  },
+  {
+   "t": 1795171697,
+   "story": "karna_kavach",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p1_1795171069/karna_kavach_p1_1795171069.mp4"
+  },
+  {
+   "t": 1795175251,
+   "story": "karna_kavach",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p2_1795174690/karna_kavach_p2_1795174690.mp4"
+  },
+  {
+   "t": 1795180168,
+   "story": "karna_kavach",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p3_1795179681/karna_kavach_p3_1795179681.mp4"
+  },
+  {
+   "t": 1795182343,
+   "story": "tanaji",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p1_1795181876/tanaji_p1_1795181876.mp4"
+  },
+  {
+   "t": 1795189815,
+   "story": "tanaji",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p2_1795189231/tanaji_p2_1795189231.mp4"
+  },
+  {
+   "t": 1795193386,
+   "story": "tanaji",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p3_1795192804/tanaji_p3_1795192804.mp4"
+  },
+  {
+   "t": 1795197089,
+   "story": "tanaji",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p4_1795196398/tanaji_p4_1795196398.mp4"
+  },
+  {
+   "t": 1795200673,
+   "story": "kuldhara",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p1_1795199987/kuldhara_p1_1795199987.mp4"
+  },
+  {
+   "t": 1795204156,
+   "story": "kuldhara",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p2_1795203542/kuldhara_p2_1795203542.mp4"
+  },
+  {
+   "t": 1795211182,
+   "story": "kuldhara",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p3_1795210705/kuldhara_p3_1795210705.mp4"
+  },
+  {
+   "t": 1795214910,
+   "story": "kuldhara",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p4_1795214357/kuldhara_p4_1795214357.mp4"
+  },
+  {
+   "t": 1795245402,
+   "story": "eklavya",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/eklavya_p1_1795244833/eklavya_p1_1795244833.mp4"
+  }
+ ],
+ "token_refreshed": 0,
+ "last_genre": "myth"
+}
