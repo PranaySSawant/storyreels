@@ -1,0 +1,682 @@
+{
+ "done": [
+  "chakravyuh",
+  "afzal_khan",
+  "vikram_betaal",
+  "ahiravan",
+  "agra_escape",
+  "bhangarh",
+  "karna_kavach",
+  "tanaji",
+  "kuldhara",
+  "eklavya",
+  "pavankhind",
+  "shaniwar_wada",
+  "bhishma_pratigya",
+  "ahilyabai",
+  "dumas_beach",
+  "barbarik",
+  "haldighati",
+  "dow_hill",
+  "sanjeevani",
+  "prithviraj",
+  "roopkund",
+  "lanka_dahan"
+ ],
+ "current": {
+  "id": "rani_durgavati",
+  "title": "रानी दुर्गावती",
+  "genre": "history",
+  "plan": {
+   "story_title": "रानी दुर्गावती",
+   "total_parts": 4,
+   "characters": {
+    "rani": {
+     "name": "रानी दुर्गावती",
+     "preset": "queen",
+     "voice": "woman"
+    },
+    "vir": {
+     "name": "वीर नारायण",
+     "preset": "prince",
+     "voice": "young_man"
+    },
+    "asaf": {
+     "name": "असफ़ ख़ान",
+     "preset": "villain",
+     "voice": "villain"
+    },
+    "adhar": {
+     "name": "अधर कयास्था",
+     "preset": "elder_king",
+     "voice": "old_man"
+    },
+    "arjun": {
+     "name": "अर्जुन दास",
+     "preset": "warrior",
+     "voice": "man"
+    }
+   },
+   "main_character": "rani",
+   "parts": [
+    {
+     "summary": "Rani learns of Asaf Khan’s approaching army and decides to confront them despite counsel to retreat.",
+     "beats": [
+      "Asaf Khan’s Mughal forces set up camp near the Gaur river",
+      "Rani receives urgent warning from Diwan Adhar",
+      "She debates strategy with her son Vir Narayan",
+      "Adhar urges guerrilla tactics, Rani insists on open battle",
+      "Rani orders troops to fortify the Narrai valley"
+     ],
+     "reveal": "बहुत कम लोग जानते हैं कि रानी ने अपनी राजधानी चौरागढ़ किले में बदलकर इस घाटी को रक्षा के लिए चुना था।",
+     "open_loop": "क्या रानी की सेना मुगलों की तोपखाने को रोक पाएगी?"
+    },
+    {
+     "summary": "The battle erupts; Rani leads from her elephant, Arjun Das falls, and she takes direct command.",
+     "beats": [
+      "Mughal cannons roar, smoke fills the valley",
+      "Rani mounts her elephant Sarman, rallying troops",
+      "Warrior Arjun Das charges and is slain",
+      "Rani grabs a bow, hits a Mughal commander",
+      "She commands troops to press forward"
+     ],
+     "reveal": "रानी ने खुद एक दुश्मन कमांडर को तीर मार कर गिराया, जो कम ही ज्ञात है।",
+     "open_loop": "क्या रानी की अगली चाल मुगल प्रगति को रोक पाएगी?"
+    },
+    {
+     "summary": "Counselors push for night guerrilla attacks, but Rani chooses open combat; heavy casualties ensue.",
+     "beats": [
+      "Adhar and other chiefs plead for night raids",
+      "Rani refuses, orders troops to form line at dawn",
+      "Mughal muskets and cannons unleash deadly fire",
+      "Prince Vir Narayan fights fiercely beside his mother",
+      "The Gond army suffers severe losses"
+     ],
+     "reveal": "बहुत कम लोग जानते हैं कि वीर नारायण केवल उन्नीस वर्ष का था जब वह इस युद्ध में लड़ा।",
+     "open_loop": "क्या रानी इस विनाशकारी हमले से बच पाएगी?"
+    },
+    {
+     "summary": "Facing inevitable defeat, Rani chooses death over capture, leaping from her elephant; her legacy endures.",
+     "beats": [
+      "Rani sees the valley falling to Mughal fire",
+      "She decides to die honorably rather than be captured",
+      "Rani leaps from her elephant into the river",
+      "Asaf Khan orders his men to halt the slaughter",
+      "Her sword later becomes a relic in Jabalpur museum"
+     ],
+     "reveal": "उसकी तलवार आज भी जबलपुर के संग्रहालय में प्रदर्शित है, जो कम ही ज्ञात है।",
+     "open_loop": ""
+    }
+   ],
+   "reference": "Durgavati (Bundeli: दुर्गावती) (5 October 1524 – 24 June 1564), popularly known as Rani Durgavati, was the regent queen of Gondwana during the infancy of her son Vir Narayan, from 1550 to 1564. She married Dalpat Shah, a son of the Gond King Sangram Shah. She is mainly remembered for her battles against the Mughal invasion of Gondwana.\n\n== Early life ==\nAccording to a horoscope, Durgavati was born on 5 October 1524. She had a sister named Kamlawati.\nIn popular culture and the Gond folklore, Durgavati has often been portrayed as a Gond tribal queen. However, she was a chandel by birth, and married into the Raj Gond family. Her father was a Chandel king, who ruled a principality comprising Rath and Mahoba. Akbarnama, by the Mughal chronicler Abul Fazl, names Durgavati's father as Salbahan or Salbhan (Shalivahan); however, some later accounts name the king as Keerat Singh. These accounts seem to have confused Durgavati's father with Keerat Singh, who was another Chandel king and the ruler of Kalinjar. Modern historians generally consider these two as different people: Keerat Singh was belonged to the main Chandel line, while Durgavati's father Shalivahan belonged to a cadet branch.\nAccording to folklore, Durgavati's father invited prince Dalpat (or Dalpati) Shah of Garha Katanga to his kingdom for a hunting expedition. Durgavati met Dalpat Shah at the Mania Devi temple in Mahoba, and the two fell in love. Sometime later, her father organized her svayamvara, a Hindu ritual by which brides select a husband from a group of men invited to the event. The various legends differ on how Durgavati and Dalpat Shah got married:\n\nAccording to the 18th-century texts  Gadhesh Nrpa Varnan Samagrah Shlokah and Rupnath's Gadhesh Nrpa Varnim, Dalpat Shah defeated the all other kings who attended the svayamvara and won Durgavati's hand in marriage.\nHistorian G.V. Bhave records another legend, according to which Durgavati sent a letter to Dalpat Shah, asking him to visit Mahoba and take her when her parents would be out of town. Dalpat Shah arrived in Mahoba with 12,000 soldiers, took Durgavati to his capital Singorgarh, and married her there.\nThe Akbarnama states that Durgavati's father was in \"bad circumstances\", and was forced to give Durgavati in marriage to Dalpat Shah, who was wealthy and militarily powerful despite the lower social status of the Gonds.\nDurgavati gave birth to a son named Bir (or Vir) Narayan in 1545.\n\n== Early struggles as a regent ==\nDalpat Shah died in 1550 CE when his successor Crown Prince Vir Narayan was merely 5 years old. His wife, Durgavati rose to take the reins of the Gondwana kingdom as regent during the new king's minority. Diwan Adhar Kayastha and Minister Man Thakur helped the Queen in looking after the administration successfully and effectively. Queen Durgavati promoted peace, trade, and good will throughout her realm.\nRani Durgavati moved her capital from Singorgarh fort to Chauragarh fort. It was a fort of strategic importance situated on the Satpura hill range.\n\n=== Conflict with Malwa Sultanate ===\nAfter the death of Sher Shah Suri, Shuja Khan captured Malwa and was succeeded by his son Baz Bahadur in 1556. After ascending to the throne, Baz invaded Rani Durgavati's Gondwana but the invasion was repulsed with heavy losses for the former earning the latter a lot of prestige.\n\n== Mughal Invasion ==\nIn 1562, Akbar vanquished the Malwa ruler Baz Bahadur and conquered Malwa, making it a Mughal dominion. Consequently, the state boundary of the Rani touched the Mughal Empire. Rani's contemporary was a Mughal general, Khwaja Abdul Majid Asaf Khan who defeated Ramchandra Singh, the raja of Rewa. He desired the Queen Durgavati and the wealth of Gondwana. He led the Mughal invasion of the Rani's realm after gaining permission from emperor Akbar.\nWhen the Rani heard about the invasions by Asaf Khan she decided to defend her kingdom with all her might although her Diwan, Beohar Adhar Simha (Adhar Kayastha) warned about the strength of the invading Mughal forces. The Rani maintained her motto that it was better to die respectfully than to live a disgraceful life.\nTo fight a defensive battle, she went to Narrai, situated between a hilly range on one side and two rivers Gaur and Narmada on the other side. It was an unequal battle with trained soldiers and modern weapons like muskets and cannons in multitude on the invading Mughal side and a few untrained soldiers with older weapons on the side of Rani Durgavati. Her Faujdar, Arjun Das was killed in the battle. The Rani then decided to lead the defense herself. As the enemy entered the valley, the soldiers of the Rani attacked them. Both sides lost some men but the Rani's army suffered heavier casualties.\nThe Rani's domains were very federal, much more decentralised than an average non-tribal kingdom. There were fortress districts, which were administrative units and were controlled either directly by the monarch or through subordinate feudal lords (jag",
+   "reference_source": "en.wikipedia: Rani Durgavati; hi.wikipedia: रानी दुर्गावती"
+  },
+  "next_part": 1,
+  "prev_summary": null,
+  "pending": null
+ },
+ "posts": [
+  {
+   "t": 1795073158,
+   "story": "chakravyuh",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p1_1795072743/chakravyuh_p1_1795072743.mp4"
+  },
+  {
+   "t": 1795079554,
+   "story": "chakravyuh",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p2_1795078936/chakravyuh_p2_1795078936.mp4"
+  },
+  {
+   "t": 1795088889,
+   "story": "chakravyuh",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p3_1795088280/chakravyuh_p3_1795088280.mp4"
+  },
+  {
+   "t": 1795092541,
+   "story": "chakravyuh",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/chakravyuh_p4_1795092176/chakravyuh_p4_1795092176.mp4"
+  },
+  {
+   "t": 1795095916,
+   "story": "afzal_khan",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p1_1795095467/afzal_khan_p1_1795095467.mp4"
+  },
+  {
+   "t": 1795099679,
+   "story": "afzal_khan",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p2_1795099050/afzal_khan_p2_1795099050.mp4"
+  },
+  {
+   "t": 1795103618,
+   "story": "afzal_khan",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/afzal_khan_p3_1795103177/afzal_khan_p3_1795103177.mp4"
+  },
+  {
+   "t": 1795106723,
+   "story": "vikram_betaal",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p1_1795106247/vikram_betaal_p1_1795106247.mp4"
+  },
+  {
+   "t": 1795110383,
+   "story": "vikram_betaal",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p2_1795109864/vikram_betaal_p2_1795109864.mp4"
+  },
+  {
+   "t": 1795114032,
+   "story": "vikram_betaal",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p3_1795113450/vikram_betaal_p3_1795113450.mp4"
+  },
+  {
+   "t": 1795117493,
+   "story": "vikram_betaal",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/vikram_betaal_p4_1795117054/vikram_betaal_p4_1795117054.mp4"
+  },
+  {
+   "t": 1795121025,
+   "story": "ahiravan",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p1_1795120662/ahiravan_p1_1795120662.mp4"
+  },
+  {
+   "t": 1795124638,
+   "story": "ahiravan",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p2_1795124263/ahiravan_p2_1795124263.mp4"
+  },
+  {
+   "t": 1795128507,
+   "story": "ahiravan",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p3_1795127887/ahiravan_p3_1795127887.mp4"
+  },
+  {
+   "t": 1795132294,
+   "story": "ahiravan",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahiravan_p4_1795131857/ahiravan_p4_1795131857.mp4"
+  },
+  {
+   "t": 1795135453,
+   "story": "agra_escape",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p1_1795135063/agra_escape_p1_1795135063.mp4"
+  },
+  {
+   "t": 1795139123,
+   "story": "agra_escape",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p2_1795138671/agra_escape_p2_1795138671.mp4"
+  },
+  {
+   "t": 1795149811,
+   "story": "agra_escape",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p3_1795149464/agra_escape_p3_1795149464.mp4"
+  },
+  {
+   "t": 1795153480,
+   "story": "agra_escape",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/agra_escape_p4_1795153073/agra_escape_p4_1795153073.mp4"
+  },
+  {
+   "t": 1795157432,
+   "story": "bhangarh",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p1_1795156983/bhangarh_p1_1795156983.mp4"
+  },
+  {
+   "t": 1795160932,
+   "story": "bhangarh",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p2_1795160274/bhangarh_p2_1795160274.mp4"
+  },
+  {
+   "t": 1795164457,
+   "story": "bhangarh",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p3_1795163888/bhangarh_p3_1795163888.mp4"
+  },
+  {
+   "t": 1795168028,
+   "story": "bhangarh",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhangarh_p4_1795167481/bhangarh_p4_1795167481.mp4"
+  },
+  {
+   "t": 1795171697,
+   "story": "karna_kavach",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p1_1795171069/karna_kavach_p1_1795171069.mp4"
+  },
+  {
+   "t": 1795175251,
+   "story": "karna_kavach",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p2_1795174690/karna_kavach_p2_1795174690.mp4"
+  },
+  {
+   "t": 1795180168,
+   "story": "karna_kavach",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/karna_kavach_p3_1795179681/karna_kavach_p3_1795179681.mp4"
+  },
+  {
+   "t": 1795182343,
+   "story": "tanaji",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p1_1795181876/tanaji_p1_1795181876.mp4"
+  },
+  {
+   "t": 1795189815,
+   "story": "tanaji",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p2_1795189231/tanaji_p2_1795189231.mp4"
+  },
+  {
+   "t": 1795193386,
+   "story": "tanaji",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p3_1795192804/tanaji_p3_1795192804.mp4"
+  },
+  {
+   "t": 1795197089,
+   "story": "tanaji",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/tanaji_p4_1795196398/tanaji_p4_1795196398.mp4"
+  },
+  {
+   "t": 1795200673,
+   "story": "kuldhara",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p1_1795199987/kuldhara_p1_1795199987.mp4"
+  },
+  {
+   "t": 1795204156,
+   "story": "kuldhara",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p2_1795203542/kuldhara_p2_1795203542.mp4"
+  },
+  {
+   "t": 1795211182,
+   "story": "kuldhara",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p3_1795210705/kuldhara_p3_1795210705.mp4"
+  },
+  {
+   "t": 1795214910,
+   "story": "kuldhara",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/kuldhara_p4_1795214357/kuldhara_p4_1795214357.mp4"
+  },
+  {
+   "t": 1795245402,
+   "story": "eklavya",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/eklavya_p1_1795244833/eklavya_p1_1795244833.mp4"
+  },
+  {
+   "t": 1795279548,
+   "story": "eklavya",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/eklavya_p2_1795279127/eklavya_p2_1795279127.mp4"
+  },
+  {
+   "t": 1795283771,
+   "story": "eklavya",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/eklavya_p3_1795283333/eklavya_p3_1795283333.mp4"
+  },
+  {
+   "t": 1795301078,
+   "story": "eklavya",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/eklavya_p4_1795300707/eklavya_p4_1795300707.mp4"
+  },
+  {
+   "t": 1795346112,
+   "story": "pavankhind",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/pavankhind_p1_1795345597/pavankhind_p1_1795345597.mp4"
+  },
+  {
+   "t": 1795356825,
+   "story": "pavankhind",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/pavankhind_p2_1795356392/pavankhind_p2_1795356392.mp4"
+  },
+  {
+   "t": 1795371177,
+   "story": "pavankhind",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/pavankhind_p3_1795370562/pavankhind_p3_1795370562.mp4"
+  },
+  {
+   "t": 1795385427,
+   "story": "shaniwar_wada",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/shaniwar_wada_p1_1795384957/shaniwar_wada_p1_1795384957.mp4"
+  },
+  {
+   "t": 1795434302,
+   "story": "shaniwar_wada",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/shaniwar_wada_p2_1795433959/shaniwar_wada_p2_1795433959.mp4"
+  },
+  {
+   "t": 1795438997,
+   "story": "shaniwar_wada",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/shaniwar_wada_p3_1795438516/shaniwar_wada_p3_1795438516.mp4"
+  },
+  {
+   "t": 1795449138,
+   "story": "shaniwar_wada",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/shaniwar_wada_p4_1795448381/shaniwar_wada_p4_1795448381.mp4"
+  },
+  {
+   "t": 1795454373,
+   "story": "bhishma_pratigya",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhishma_pratigya_p1_1795453637/bhishma_pratigya_p1_1795453637.mp4"
+  },
+  {
+   "t": 1795519270,
+   "story": "bhishma_pratigya",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhishma_pratigya_p2_1795518724/bhishma_pratigya_p2_1795518724.mp4"
+  },
+  {
+   "t": 1795542513,
+   "story": "bhishma_pratigya",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhishma_pratigya_p3_1795542033/bhishma_pratigya_p3_1795542033.mp4"
+  },
+  {
+   "t": 1795549872,
+   "story": "bhishma_pratigya",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/bhishma_pratigya_p4_1795549209/bhishma_pratigya_p4_1795549209.mp4"
+  },
+  {
+   "t": 1795570393,
+   "story": "ahilyabai",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahilyabai_p1_1795569940/ahilyabai_p1_1795569940.mp4"
+  },
+  {
+   "t": 1795585815,
+   "story": "ahilyabai",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahilyabai_p2_1795585251/ahilyabai_p2_1795585251.mp4"
+  },
+  {
+   "t": 1795591389,
+   "story": "ahilyabai",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahilyabai_p3_1795591044/ahilyabai_p3_1795591044.mp4"
+  },
+  {
+   "t": 1795607438,
+   "story": "ahilyabai",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/ahilyabai_p4_1795606840/ahilyabai_p4_1795606840.mp4"
+  },
+  {
+   "t": 1795611681,
+   "story": "dumas_beach",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dumas_beach_p1_1795611289/dumas_beach_p1_1795611289.mp4"
+  },
+  {
+   "t": 1795619896,
+   "story": "dumas_beach",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dumas_beach_p2_1795619122/dumas_beach_p2_1795619122.mp4"
+  },
+  {
+   "t": 1795654188,
+   "story": "dumas_beach",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dumas_beach_p3_1795653659/dumas_beach_p3_1795653659.mp4"
+  },
+  {
+   "t": 1795661170,
+   "story": "barbarik",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/barbarik_p1_1795660851/barbarik_p1_1795660851.mp4"
+  },
+  {
+   "t": 1795665873,
+   "story": "barbarik",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/barbarik_p2_1795665310/barbarik_p2_1795665310.mp4"
+  },
+  {
+   "t": 1795690236,
+   "story": "barbarik",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/barbarik_p3_1795689676/barbarik_p3_1795689676.mp4"
+  },
+  {
+   "t": 1795724129,
+   "story": "haldighati",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/haldighati_p1_1795723465/haldighati_p1_1795723465.mp4"
+  },
+  {
+   "t": 1795734775,
+   "story": "haldighati",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/haldighati_p2_1795734308/haldighati_p2_1795734308.mp4"
+  },
+  {
+   "t": 1795740406,
+   "story": "haldighati",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/haldighati_p3_1795740085/haldighati_p3_1795740085.mp4"
+  },
+  {
+   "t": 1795746000,
+   "story": "haldighati",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/haldighati_p4_1795745323/haldighati_p4_1795745323.mp4"
+  },
+  {
+   "t": 1795767303,
+   "story": "dow_hill",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dow_hill_p1_1795766644/dow_hill_p1_1795766644.mp4"
+  },
+  {
+   "t": 1795772846,
+   "story": "dow_hill",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dow_hill_p2_1795772505/dow_hill_p2_1795772505.mp4"
+  },
+  {
+   "t": 1795783923,
+   "story": "dow_hill",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/dow_hill_p3_1795783334/dow_hill_p3_1795783334.mp4"
+  },
+  {
+   "t": 1795789309,
+   "story": "sanjeevani",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/sanjeevani_p1_1795788879/sanjeevani_p1_1795788879.mp4"
+  },
+  {
+   "t": 1795794452,
+   "story": "sanjeevani",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/sanjeevani_p2_1795794100/sanjeevani_p2_1795794100.mp4"
+  },
+  {
+   "t": 1795799774,
+   "story": "sanjeevani",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/sanjeevani_p3_1795799092/sanjeevani_p3_1795799092.mp4"
+  },
+  {
+   "t": 1795817613,
+   "story": "prithviraj",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/prithviraj_p1_1795816932/prithviraj_p1_1795816932.mp4"
+  },
+  {
+   "t": 1795820930,
+   "story": "prithviraj",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/prithviraj_p2_1795820524/prithviraj_p2_1795820524.mp4"
+  },
+  {
+   "t": 1795830675,
+   "story": "prithviraj",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/prithviraj_p3_1795830154/prithviraj_p3_1795830154.mp4"
+  },
+  {
+   "t": 1795838056,
+   "story": "prithviraj",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/prithviraj_p4_1795837321/prithviraj_p4_1795837321.mp4"
+  },
+  {
+   "t": 1795848774,
+   "story": "roopkund",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/roopkund_p1_1795848123/roopkund_p1_1795848123.mp4"
+  },
+  {
+   "t": 1795855866,
+   "story": "roopkund",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/roopkund_p2_1795855357/roopkund_p2_1795855357.mp4"
+  },
+  {
+   "t": 1795860764,
+   "story": "roopkund",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/roopkund_p3_1795860148/roopkund_p3_1795860148.mp4"
+  },
+  {
+   "t": 1795866550,
+   "story": "lanka_dahan",
+   "part": 1,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/lanka_dahan_p1_1795866131/lanka_dahan_p1_1795866131.mp4"
+  },
+  {
+   "t": 1795870262,
+   "story": "lanka_dahan",
+   "part": 2,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/lanka_dahan_p2_1795869751/lanka_dahan_p2_1795869751.mp4"
+  },
+  {
+   "t": 1795882575,
+   "story": "lanka_dahan",
+   "part": 3,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/lanka_dahan_p3_1795882192/lanka_dahan_p3_1795882192.mp4"
+  },
+  {
+   "t": 1795890061,
+   "story": "lanka_dahan",
+   "part": 4,
+   "media_id": "email",
+   "link": "https://github.com/PranaySSawant/storyreels/releases/download/lanka_dahan_p4_1795889389/lanka_dahan_p4_1795889389.mp4"
+  }
+ ],
+ "token_refreshed": 0,
+ "last_genre": "history"
+}
